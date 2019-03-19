@@ -15,21 +15,42 @@ This role requires the following Python Plugins:
 
 General Usage
 ------------
+
+**_Local Conversion_**
+
 1. Copy exmaples/import.csv to ./import.csv
 
 2. Add meta-data to respective CSV fields
 
 3. Run generateXml.py, this will create an XML file named `conversion.xml`
 
+
+
+**_Lambda Conversion_**
+
+1. Copy exmaples/import.csv to ./import.csv
+
+2. Add meta-data to respective CSV fields
+
+3. Upload PDF files to PDF directory in provided S3 Bucket
+
+3a. Upload CSV to Provided S3 Bucket
+
+* Lambda function will trigger on CSV upload and create file `conversion.xml`, download said file
+
+
+---
+
+
 4. In OJS Admin click "Import/Export" under Tools 
 
-* Click Native Import/Export 
+ * Click Native Import/Export 
 
 5. Drag and Drop or Click "Add Files", upload `conversion.xml`
 
 6. Click "Import"
 
-* A progress bar will be shown, after which you will be taken to a completion summary screen
+ * A progress bar will be shown, after which you will be taken to a completion summary screen
 
 _You may recieve warnings stating:_
 > Existing issue with id ### matches the given issue identification "<issue_identification><volume>##</volume><number>##</number><year>#####</year><title/></issue_identification>". This issue will not be modified, but articles will be added.
