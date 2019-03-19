@@ -1,6 +1,8 @@
 # python_ojs_import
 XML to CSV Conversion Script for Batch Import to OJS
 
+_Adapted from [OJSXML Plugin](https://github.com/ualbertalib/ojsxml)_
+
 Requirements
 ------------
 
