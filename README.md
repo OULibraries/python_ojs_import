@@ -33,10 +33,9 @@ General Usage
 2. Add meta-data to respective CSV fields
 
 3. Upload PDF files to PDF directory in provided S3 Bucket
+ * Upload CSV to Provided S3 Bucket
 
-3a. Upload CSV to Provided S3 Bucket
-
-* Lambda function will trigger on CSV upload and create file `conversion.xml`, download said file
+* _Lambda function will trigger on CSV upload and create file `conversion.xml`, download said file_
 
 
 ---
