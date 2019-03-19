@@ -7,8 +7,11 @@ import boto3
 
 def lambda_handler(event, context):
     importlist=[]
+    bucket= mybucket
+    pdf_location = https://mybucket.3.amazonaws.com
+        
     s3 = boto3.resource('s3')
-    s3.meta.client.download_file('ul-theatreorgan', 'csv/import.csv', '/tmp/import.csv')
+    s3.meta.client.download_file(bucket, 'csv/import.csv', '/tmp/import.csv')
 
     input_file = csv.DictReader(open("/tmp/import.csv"))
     issues=[]
@@ -67,7 +70,7 @@ def lambda_handler(event, context):
 
     article.write("/tmp/otherypy.xml")
     
-    s3.meta.client.upload_file('/tmp/otherypy.xml','ul-theatreorgan','conversion.xml')
+    s3.meta.client.upload_file('/tmp/otherypy.xml',bucket,'conversion.xml')
     return {
         'statusCode': 200,
         'body': json.dumps('Hello from Lambda!')
@@ -180,7 +183,7 @@ def buildArticle(children):
     tb.start("name",{});
     tb.data(children['file1']);
     tb.end("name");
-    tb.start("href", {"src": "http://ul-theatreorgan.s3-website-us-east-1.amazonaws.com/pdf/"+ children['file1']
+    tb.start("href", {"src": pdf_location+ children['file1']
     ,"mime_type": "application/pdf"})
     tb.end("href");
     tb.end("revision");
