@@ -1,3 +1,4 @@
+from os import remove
 import csv
 import xml.etree.ElementTree as ET
 import datetime
@@ -137,7 +138,7 @@ def buildArticle(children):
     return tb.close()
 
 importlist=[]
-input_file = csv.DictReader(open("/Users/benn7681/ojs_importer/test-metadata-orig.csv"))
+input_file = csv.DictReader(open("import.csv"))
 issues=[]
 articles=dict()
 sections={}
@@ -158,12 +159,12 @@ for it in issues:
             sections[it].append(section)
         #    articles[it].append(o)
 
-with open("/Users/benn7681/ojs_importer/pyout.xml", "w") as f:
+with open("pyout.xml", "w") as f:
     f.write("<?xml version=\"1.0\"?><issues xmlns=\"http://pkp.sfu.ca\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\"></issues>")
 
 
 ET.register_namespace("", "http://pkp.sfu.ca")
-article = ET.parse("/Users/benn7681/ojs_importer/pyout.xml")
+article = ET.parse("pyout.xml")
 
 root = article.getroot()
 for importdict in importlist:
@@ -192,4 +193,5 @@ for importdict in importlist:
     issue.append(buildArticle(importdict))
     root.append(issue)
 
-article.write("/Users/benn7681/ojs_importer/otherypy.xml")
+article.write("conversion.xml")
+remove("pyout.xml")
