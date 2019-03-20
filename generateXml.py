@@ -6,6 +6,15 @@ from pprint import pprint
 
 
 def buildSections(children):
+     """
+    Build OJS Sections XML Element
+
+    Parameters:
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Sections
+    """
         tb=ET.TreeBuilder()
         tb.start("sections",{})
         for i in children:
@@ -23,6 +32,16 @@ def buildSections(children):
         return(tb.close())
 
 def buildIdentification(children):
+     """
+    Build OJS Identification XML Element
+
+    Parameters:
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Identification
+    """
+    
     tb=ET.TreeBuilder()
     tb.start("issue_identification",{})
     tb.start("volume",{})
@@ -41,6 +60,16 @@ def buildIdentification(children):
     return tb.close()
 
 def buildPublication(children):
+     """
+    Build OJS Publication XML Element
+
+    Parameters:
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Publication
+    """
+
     tb=ET.TreeBuilder()
     tb.start("date_published",{})
     tb.data(children['issueDatepublished'])
@@ -51,6 +80,16 @@ def buildPublication(children):
 
 
 def buildArticle(children):
+ """
+    Build OJS Article XML Element
+
+    Parameters:
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Article
+    """
+    
     tb=ET.TreeBuilder()
     tb.start("articles",{})
     tb.start("article", {"section_ref": children['sectionAbbrev'],"stage": "production",
@@ -137,6 +176,15 @@ def buildArticle(children):
     tb.end("articles")
     return tb.close()
 
+#####
+# Takes a CSV and parses it into a Python Dict containing Key,Value Mappings from CSV
+# The Dict is then passed to XML builder functions
+# The final XML Tree that is build is then dumped to a file for import into OJS
+#
+# Parameters:
+# import.csv: CSV containing OJS fields to conver to XML
+# conversion.xml: Resulting XML document for OJS Import 
+#####
 importlist=[]
 input_file = csv.DictReader(open("import.csv"))
 issues=[]

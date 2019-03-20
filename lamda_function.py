@@ -5,7 +5,19 @@ import datetime
 from pprint import pprint
 import boto3
 
+#Main Lambda Handler
 def lambda_handler(event, context):
+    """
+    AWS Lambda Hanlder Function, main driver for Lambda.
+
+    Parameters:
+    event : Source that triggered Lambda Function; in this case CSV Upload to S3.
+    context: This object provides methods and properties that provide information about the invocation, function, and execution environment.
+    
+    Returns:
+    json: Response and Status of Lambda Function
+    """
+
     importlist=[]
     s3 = boto3.resource('s3')
     bucket='mybucket'
@@ -76,6 +88,15 @@ def lambda_handler(event, context):
     }
 
 def buildSections(children):
+    """
+    Build OJS Sections XML Element 
+
+    Parameters: 
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Sections
+    """
         tb=ET.TreeBuilder()
         tb.start("sections",{})
         for i in children:
@@ -93,6 +114,18 @@ def buildSections(children):
         return(tb.close())
 
 def buildIdentification(children):
+    """
+    Build OJS Identification XML Element
+    
+    
+    Parameters: 
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Article
+    """
+
+
     tb=ET.TreeBuilder()
     tb.start("issue_identification",{})
     tb.start("volume",{})
@@ -111,6 +144,16 @@ def buildIdentification(children):
     return tb.close()
 
 def buildPublication(children):
+    """
+    Build OJS Publication XML Element
+
+
+    Parameters: 
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Sections
+    """
     tb=ET.TreeBuilder()
     tb.start("date_published",{})
     tb.data(children['issueDatepublished'])
@@ -121,6 +164,17 @@ def buildPublication(children):
 
 
 def buildArticle(children):
+     """
+    Build OJS Article XML Element
+
+
+    Parameters: 
+    children (dict): A Dictionary containing section key,value pairs for OJS import
+
+    Returns:
+    Element: XML Element Object containing OJS Article
+    """   
+    
     tb=ET.TreeBuilder()
     tb.start("articles",{})
     tb.start("article", {"section_ref": children['sectionAbbrev'],"stage": "production",
