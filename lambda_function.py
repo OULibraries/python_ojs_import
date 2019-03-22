@@ -23,7 +23,23 @@ def lambda_handler(event, context):
 
     importlist=[]
     s3 = boto3.resource('s3')
+    client = boto3.client('s3')
     s3.meta.client.download_file(bucket, 'csv/import.csv', '/tmp/import.csv')
+
+    # Tag Uploaded CSV for object lifecycle management
+    key = 'csv/import.csv'
+    client.put_object_tagging(
+        Bucket=bucket,
+        Key=key,
+        Tagging={
+            'TagSet': [
+                {
+                    'Key': 'upload_type',
+                    'Value': 'csv'
+                },
+            ]
+        }
+    )
 
     input_file = csv.DictReader(open("/tmp/import.csv"))
     issues=[]
