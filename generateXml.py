@@ -1,8 +1,6 @@
 from os import remove
 import csv
 import xml.etree.ElementTree as ET
-import datetime
-from pprint import pprint
 
 
 def buildSections(children):
