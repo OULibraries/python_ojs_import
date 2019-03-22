@@ -1,8 +1,6 @@
 import json
 import csv
 import xml.etree.ElementTree as ET
-import datetime
-from pprint import pprint
 import boto3
 
 #Main Lambda Handler
