@@ -203,7 +203,6 @@ for it in issues:
         if o['issueTitle']==it:
             section= {"sectionTitle":o['sectionTitle'], "sectionAbbrev":o['sectionAbbrev']}
             sections[it].append(section)
-        #    articles[it].append(o)
 
 with open("pyout.xml", "w") as f:
     f.write("<?xml version=\"1.0\"?><issues xmlns=\"http://pkp.sfu.ca\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\"></issues>")
@@ -217,7 +216,6 @@ for importdict in importlist:
     articles[importdict['issueTitle']]=importdict
 
 articles=set(articles)
-#pprint(articles)
 tr=ET.TreeBuilder()
 tr.start("issue",{})
 tr.end("issue")
