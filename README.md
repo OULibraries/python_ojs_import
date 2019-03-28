@@ -22,7 +22,7 @@ General Usage
 
 2. Add meta-data to respective CSV fields
 
-3. Run generateXml.py, this will create an XML file named `conversion.xml`
+3. Run generate_xml.py, this will create an XML file named `conversion.xml`
 
 
 
