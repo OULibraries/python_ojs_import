@@ -9,9 +9,7 @@
                           ARTICLES use this to map parent-child relationship
 """
 
-import xml.etree.ElementTree
-if 'TREE_BUILDER' not in globals():
-    TREE_BUILDER = xml.etree.ElementTree.TreeBuilder()
+import xml.etree.ElementTree as ElementTree
 
 
 def build_sections(children):
@@ -25,6 +23,7 @@ def build_sections(children):
     Returns:
     Element: XML Element Object containing OJS Sections
     """
+    TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("sections", {})
     for element in children:
         TREE_BUILDER.start("section", {"ref": element['sectionAbbrev']})
@@ -52,7 +51,8 @@ def build_identification(children):
     Returns:
     Element: XML Element Object containing OJS Identification
     """
-
+    
+    TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("issue_identification", {})
     TREE_BUILDER.start("volume", {})
     TREE_BUILDER.data(children['issueVolume'])
@@ -67,6 +67,22 @@ def build_identification(children):
     TREE_BUILDER.data(children['issueTitle'])
     TREE_BUILDER.end("title")
     TREE_BUILDER.end("issue_identification")
+    return TREE_BUILDER.close()
+
+
+def build_publication(children):
+    """
+    Build OJS Publication XML Element
+
+    Parameters:
+    children (dict): A Dictionary containing section key,value pairs for OJS
+    import
+
+    Returns:
+    Element: XML Element Object containing OJS Publication
+    """
+ 
+    TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("date_published", {})
     TREE_BUILDER.data(children['issueDatepublished'])
     TREE_BUILDER.end("date_published")
@@ -84,8 +100,8 @@ def build_article(children):
     Returns:
     Element: XML Element Object containing OJS Article
     """
-
-    TREE_BUILDER.start("articles", {})
+   
+    TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("article", {
         "section_ref": children['sectionAbbrev'],
         "stage": "production",
@@ -190,5 +206,5 @@ def build_article(children):
     TREE_BUILDER.data(children['pages'])
     TREE_BUILDER.end("pages")
     TREE_BUILDER.end("article")
-    TREE_BUILDER.end("articles")
     return TREE_BUILDER.close()
+
