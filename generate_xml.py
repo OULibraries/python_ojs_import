@@ -5,84 +5,103 @@
  The final XML Tree that is built is then dumped to a file for import into OJS
 
  Vars:
-    INPUT_CSV: CSV containing OJS fields to conver to XML
-    conversion.xml: Resulting XML document for OJS Import
+    input_csv: CSV containing OJS fields to conver to XML
+    output_file: Resulting XML document for OJS Import
 """
 
-from os import remove
+import json
 import csv
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElementTree
+import boto3
 from ojs_builder import (build_identification,
+                         build_publication,
                          build_article,
-                         build_sections,
-                         build_publication)
+                         build_sections)
 
 
-IMPORTLIST = []
-INPUT_FILE = csv.DictReader(open("import.csv"))
-ISSUES = []
-ARTICLES = dict()
-SECTIONS = {}
-for i in INPUT_FILE:
-    IMPORTLIST.append(i)
+"""
+AWS Lambda Hanlder Function, main driver for Lambda.
+Parameters:
+event : Source that triggered Lambda Function;in this case CSV Upload to S3
+context: This object provides methods, properties, and information
+         about the invocation, function, and execution environment.
 
-for m in IMPORTLIST:
-    ISSUES.append(m['issueTitle'])
+Returns:
+json: Response and Status of Lambda Function
+"""
+import_list = []
+bucket = "mybucket"
+bucket_schema = "http://"
+bucket_url = bucket + ".s3.amazonaws.com"
+bucket_prefix = "/pdf/"
+bucket_location = bucket_schema + bucket_url + bucket_prefix
+input_csv = "import.csv"
+input_file = csv.DictReader(open(input_csv))
+output_file = "conversion.xml"
+issues = {}
+articles = {}
+sections = {}
+xml_version = "<?xml version=\"1.0\"?>"
+xmlns = "xmlns=\"http://pkp.sfu.ca\""
+xmlns_xsi = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+schema_location = "xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\">"
+xml_header = (xml_version + " <issues " + xmlns
+              + " " + xmlns_xsi + " " + schema_location + "</issues>")
 
-ISSUES = set(ISSUES)
+ElementTree.register_namespace("", "http://pkp.sfu.ca")
+doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+root = doc.getroot()
 
-for it in ISSUES:
-    SECTIONS[it] = []
+# Tag Uploaded CSV for object lifecycle management
+key = 'csv/import.csv'
 
-    for o in IMPORTLIST:
-        if o['issueTitle'] == it:
-            section = {"sectionTitle": o['sectionTitle'],
-                       "sectionAbbrev": o['sectionAbbrev']}
-            SECTIONS[it].append(section)
-        #    articles[it].append(o)
-XML_VERSION = "<?xml version=\"1.0\"?>"
-XMLNS = "xmlns=\"http://pkp.sfu.ca\""
-XMLNS_XSI = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-SCHEMA_LOCATION = "xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\">"
-XML_HEADER = (XML_VERSION + " <issues " + XMLNS
-              + " " + XMLNS_XSI + " " + SCHEMA_LOCATION + "</issues>")
-with open("pyout.xml", "w") as f:
-    f.write(XML_HEADER)
+for row in input_file:
+    import_list.append(row)
 
+for import_dict in import_list:
+    if import_dict['issueTitle'] not in issues:
+        issues[import_dict['issueTitle']] = {
+            "issueYear": import_dict['issueYear'],
+            "issueVolume": import_dict['issueVolume'],
+            "issueNumber": import_dict['issueNumber'],
+            "issueDatepublished": import_dict['issueDatepublished'],
+            "issueTitle": import_dict['issueTitle']}
 
-ET.register_namespace("", "http://pkp.sfu.ca")
-ARTICLE = ET.parse("pyout.xml")
+for issue_title in issues:
+    sections[issue_title] = []
+    articles[issue_title] = []
+    for import_row in import_list:
+        if import_row['issueTitle'] == issue_title:
+            section = {"sectionTitle": import_row['sectionTitle'],
+                       "sectionAbbrev": import_row['sectionAbbrev']}
+            sections[issue_title].append(section)
+            articles[issue_title].append(import_row)
 
-ROOT = ARTICLE.getroot()
-for importdict in IMPORTLIST:
-    ARTICLES[importdict['issueTitle']] = importdict
+file_number = 0
+for issue_key, issue_metadata in issues.items():
+    issue = ElementTree.Element("issue")
+    issue.append(build_identification(issue_metadata))
+    issue.append(build_publication(issue_metadata))
+    issue.append(build_sections(sections[issue_key]))
+    doc_articles = ElementTree.Element("articles")
+    for import_dict in articles[issue_key]:
+        if 'authorEmail1' not in import_dict:
+            import_dict['authorEmail1'] = ''
+        if 'authorEmail2' not in import_dict:
+            import_dict['authorEmail2'] = ''
+        if 'submission_stage' not in import_dict:
+            import_dict['submission_stage'] = 'submission'
+        if import_dict['fileGenre1'] == '':
+            import_dict['fileGenre1'] = 'Article Text'
+        if 'revision_number' not in import_dict:
+            import_dict['revision_number'] = "0"
 
-ARTICLES = set(ARTICLES)
-TREE_BUILDER = ET.TreeBuilder()
-TREE_BUILDER.start("issue", {})
-TREE_BUILDER.end("issue")
-ISSUE = (TREE_BUILDER.close())
+        import_dict['bucket_location'] = bucket_location
+        file_number += 1
+        import_dict['file_number'] = str(file_number)
+        doc_articles.append(build_article(import_dict))
+    issue.append(doc_articles)
+    root.append(issue)
 
-for importdict in IMPORTLIST:
-    if 'authorEmail1' not in importdict:
-        importdict['authorEmail1'] = ''
-    if 'authorEmail2' not in importdict:
-        importdict['authorEmail2'] = ''
-
-    bucket_schema = "http://"
-    bucket_url = "ul-theatreorgan.s3-website-us-east-1.amazonaws.com"
-    bucket_prefix = "/pdf/"
-    bucket_location = bucket_schema + bucket_url + bucket_prefix
-    importdict['bucket_location'] = bucket_location
-    TREE_BUILDER = ET.TreeBuilder()
-    TREE_BUILDER.start("issue", {})
-    TREE_BUILDER.end("issue")
-    issue = (TREE_BUILDER.close())
-    issue.append(build_identification(importdict))
-    issue.append(build_publication(importdict))
-    issue.append(build_sections(SECTIONS[importdict['issueTitle']]))
-    issue.append(build_article(importdict))
-    ROOT.append(issue)
-
-ARTICLE.write("conversion.xml")
-remove("pyout.xml")
+doc._setroot(root)
+doc.write(output_file)
