@@ -1,13 +1,3 @@
-import json
-import csv
-import boto3
-import xml.etree.ElementTree as ElementTree
-from ojs_builder import (build_identification,
-                         build_publication,
-                         build_article,
-                         build_sections)
-
-
 """
  Takes a CSV and parses it into a Python Dict containing Key,Value Mappings
  from CSV
@@ -15,9 +5,18 @@ from ojs_builder import (build_identification,
  The final XML Tree that is built is then dumped to a file for import into OJS
 
  Vars:
-    INPUT_CSV: CSV containing OJS fields to conver to XML
-    OUTPUT_FILE: Resulting XML document for OJS Import
+    input_csv: CSV containing OJS fields to conver to XML
+    output_file: Resulting XML document for OJS Import
 """
+
+import json
+import csv
+import xml.etree.ElementTree as ElementTree
+import boto3
+from ojs_builder import (build_identification,
+                         build_publication,
+                         build_article,
+                         build_sections)
 
 
 def lambda_handler(event, context):
@@ -31,33 +30,33 @@ def lambda_handler(event, context):
     Returns:
     json: Response and Status of Lambda Function
     """
-    IMPORTLIST = []
+    import_list = []
     bucket = "mybucket"
     bucket_schema = "http://"
-    bucket_url = "mybucket.s3.amazonaws.com"
+    bucket_url = bucket + ".s3.amazonaws.com"
     bucket_prefix = "/pdf/"
     bucket_location = bucket_schema + bucket_url + bucket_prefix
-    s3 = boto3.resource('s3')
+    s3_resource = boto3.resource('s3')
     client = boto3.client('s3')
-    s3.meta.client.download_file(bucket, 'csv/import.csv', '/tmp/import.csv')
-    INPUT_CSV = "/tmp/import.csv"
-    INPUT_FILE = csv.DictReader(open(INPUT_CSV))
-    OUTPUT_FILE = "/tmp/conversion.xml"
-    ISSUES = {}
-    ARTICLES = {}
-    SECTIONS = {}
-    TREE_BUILDER = ElementTree.TreeBuilder()
-    XML_VERSION = "<?xml version=\"1.0\"?>"
-    XMLNS = "xmlns=\"http://pkp.sfu.ca\""
-    XMLNS_XSI = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-    SCHEMA_LOCATION = "xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\">"
-    XML_HEADER = (XML_VERSION + " <issues " + XMLNS
-                  + " " + XMLNS_XSI + " " + SCHEMA_LOCATION + "</issues>")
+    s3_resource.meta.client.download_file(bucket,
+                                          'csv/import.csv',
+                                          '/tmp/import.csv')
+    input_csv = "/tmp/import.csv"
+    input_file = csv.DictReader(open(input_csv))
+    output_file = "/tmp/conversion.xml"
+    issues = {}
+    articles = {}
+    sections = {}
+    xml_version = "<?xml version=\"1.0\"?>"
+    xmlns = "xmlns=\"http://pkp.sfu.ca\""
+    xmlns_xsi = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+    schema_location = "xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\">"
+    xml_header = (xml_version + " <issues " + xmlns
+                  + " " + xmlns_xsi + " " + schema_location + "</issues>")
 
     ElementTree.register_namespace("", "http://pkp.sfu.ca")
-    DOC = ElementTree.ElementTree(ElementTree.fromstring(XML_HEADER))
-    ROOT = DOC.getroot()
-    ISSUE = ElementTree.Element("issue")
+    doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+    root = doc.getroot()
 
     # Tag Uploaded CSV for object lifecycle management
     key = 'csv/import.csv'
@@ -74,52 +73,54 @@ def lambda_handler(event, context):
         }
     )
 
-    for row in INPUT_FILE:
-        IMPORTLIST.append(row)
+    for row in input_file:
+        import_list.append(row)
 
-    for import_dict in IMPORTLIST:
-        if import_dict['issueTitle'] not in ISSUES:
-            ISSUES[import_dict['issueTitle']] = {
-                    "issueYear": import_dict['issueYear'],
-                    "issueVolume": import_dict['issueVolume'],
-                    "issueNumber": import_dict['issueNumber'],
-                    "issueDatepublished": import_dict['issueDatepublished'],
-                    "issueTitle": import_dict['issueTitle']
-                            }
+    for import_dict in import_list:
+        if import_dict['issueTitle'] not in issues:
+            issues[import_dict['issueTitle']] = {
+                "issueYear": import_dict['issueYear'],
+                "issueVolume": import_dict['issueVolume'],
+                "issueNumber": import_dict['issueNumber'],
+                "issueDatepublished": import_dict['issueDatepublished'],
+                "issueTitle": import_dict['issueTitle']}
 
-    for ISSUE_TITLE in ISSUES.keys():
-        SECTIONS[ISSUE_TITLE] = []
-        ARTICLES[ISSUE_TITLE] = []
-        for IMPORT_ROW in IMPORTLIST:
-            if IMPORT_ROW['issueTitle'] == ISSUE_TITLE:
-                SECTION = {"sectionTitle": IMPORT_ROW['sectionTitle'],
-                           "sectionAbbrev": IMPORT_ROW['sectionAbbrev']}
-                SECTIONS[ISSUE_TITLE].append(SECTION)
-                ARTICLES[ISSUE_TITLE].append(IMPORT_ROW)
+    for issue_title in issues:
+        sections[issue_title] = []
+        articles[issue_title] = []
+        for import_row in import_list:
+            if import_row['issueTitle'] == issue_title:
+                section = {"sectionTitle": import_row['sectionTitle'],
+                           "sectionAbbrev": import_row['sectionAbbrev']}
+                sections[issue_title].append(section)
+                articles[issue_title].append(import_row)
 
-    for ISSUE_KEY, ISSUE_METADATA in ISSUES.items():
-        ISSUE.append(build_identification(ISSUE_METADATA))
-        ISSUE.append(build_publication(ISSUE_METADATA))
-        ISSUE.append(build_sections(SECTIONS[ISSUE_KEY]))
-        DOC_ARTICLES = ElementTree.Element("articles")
-        for IMPORTDICT in ARTICLES[ISSUE_KEY]:
-            if 'authorEmail1' not in IMPORTDICT:
-                IMPORTDICT['authorEmail1'] = ''
-            if 'authorEmail2' not in IMPORTDICT:
-                IMPORTDICT['authorEmail2'] = ''
+    for issue_key, issue_metadata in issues.items():
+        issue = ElementTree.Element("issue")
+        issue.append(build_identification(issue_metadata))
+        issue.append(build_publication(issue_metadata))
+        issue.append(build_sections(sections[issue_key]))
+        doc_articles = ElementTree.Element("articles")
+        for import_dict in articles[issue_key]:
+            if 'authorEmail1' not in import_dict:
+                import_dict['authorEmail1'] = ''
+            if 'authorEmail2' not in import_dict:
+                import_dict['authorEmail2'] = ''
+            if 'submission_stage' not in import_dict:
+                import_dict['submission_stage'] = 'submission'
+            if import_dict['fileGenre1'] == '':
+                import_dict['fileGenre1'] = 'Article Text'
 
-            IMPORTDICT['bucket_location'] = bucket_location
-            DOC_ARTICLES.append(build_article(IMPORTDICT))
-        ISSUE.append(DOC_ARTICLES)
-        ROOT.append(ISSUE)
+            import_dict['bucket_location'] = bucket_location
+            doc_articles.append(build_article(import_dict))
+        issue.append(doc_articles)
+        root.append(issue)
 
-    DOC._setroot(ROOT)
-    DOC.write(OUTPUT_FILE)
-    s3.meta.client.upload_file(OUTPUT_FILE, bucket, 'conversion.xml')
+    doc._setroot(root)
+    doc.write(output_file)
+    s3_resource.meta.client.upload_file(output_file, bucket, 'conversion.xml')
     return {
         'statusCode': 200,
         'body': json.dumps('Converted:\n\t'
-                           + 'Articles: ' + str(len(ARTICLES)) + '\n\t'
-                           + 'Issues: ' + str(len(ISSUES)))
-    }
-
+                           + 'Articles: ' + str(len(articles)) + '\n\t'
+                           + 'Issues: ' + str(len(issues)))}

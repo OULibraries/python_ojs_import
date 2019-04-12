@@ -168,7 +168,7 @@ def build_article(children):
     TREE_BUILDER.end("authors")
     TREE_BUILDER.start("submission_file", {
         "id": children['seq'],
-        "stage": "proof"
+        "stage": children['submission_stage']
         })
     TREE_BUILDER.start("revision", {
         "genre": children['fileGenre1'],
