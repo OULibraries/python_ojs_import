@@ -51,7 +51,7 @@ def build_identification(children):
     Returns:
     Element: XML Element Object containing OJS Identification
     """
-    
+
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("issue_identification", {})
     TREE_BUILDER.start("volume", {})
@@ -81,7 +81,7 @@ def build_publication(children):
     Returns:
     Element: XML Element Object containing OJS Publication
     """
- 
+
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("date_published", {})
     TREE_BUILDER.data(children['issueDatepublished'])
@@ -100,7 +100,7 @@ def build_article(children):
     Returns:
     Element: XML Element Object containing OJS Article
     """
-   
+
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("article", {
         "section_ref": children['sectionAbbrev'],
@@ -167,12 +167,12 @@ def build_article(children):
     TREE_BUILDER.end("author")
     TREE_BUILDER.end("authors")
     TREE_BUILDER.start("submission_file", {
-        "id": children['seq'],
+        "id": children['file_number'],
         "stage": children['submission_stage']
         })
     TREE_BUILDER.start("revision", {
         "genre": children['fileGenre1'],
-        "number": children['seq'],
+        "number": children['revision_number'],
         "filetype": "application/pdf",
         "filename": children['file1']
         })
@@ -188,7 +188,7 @@ def build_article(children):
     TREE_BUILDER.end("submission_file")
     TREE_BUILDER.start("article_galley", {})
     TREE_BUILDER.start("id", {})
-    TREE_BUILDER.data(children['seq'])
+    TREE_BUILDER.data(children['file_number'])
     TREE_BUILDER.end("id")
     TREE_BUILDER.start("name", {})
     TREE_BUILDER.data("PDF")
@@ -197,8 +197,8 @@ def build_article(children):
     TREE_BUILDER.data(children['seq'])
     TREE_BUILDER.end("seq")
     TREE_BUILDER.start("submission_file_ref", {
-        "id": children['seq'],
-        "revision": children['seq']
+        "id": children['file_number'],
+        "revision": children['revision_number']
     })
     TREE_BUILDER.end("submission_file_ref")
     TREE_BUILDER.end("article_galley")
@@ -207,4 +207,3 @@ def build_article(children):
     TREE_BUILDER.end("pages")
     TREE_BUILDER.end("article")
     return TREE_BUILDER.close()
-
