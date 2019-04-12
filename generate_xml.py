@@ -9,10 +9,9 @@
     output_file: Resulting XML document for OJS Import
 """
 
-import json
 import csv
+import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
-import boto3
 from ojs_builder import (build_identification,
                          build_publication,
                          build_article,
@@ -104,4 +103,5 @@ for issue_key, issue_metadata in issues.items():
     root.append(issue)
 
 doc._setroot(root)
-doc.write(output_file)
+pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(doc.getroot()))
+open(output_file, 'w').write((pretty_xml.toprettyxml()))
