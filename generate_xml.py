@@ -93,7 +93,7 @@ for issue_key, issue_metadata in issues.items():
         if import_dict['fileGenre1'] == '':
             import_dict['fileGenre1'] = 'Article Text'
         if 'revision_number' not in import_dict:
-            import_dict['revision_number'] = "0"
+            import_dict['revision_number'] = "1"
 
         import_dict['bucket_location'] = bucket_location
         file_number += 1
