@@ -11,6 +11,7 @@
 
 import json
 import csv
+import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
 import boto3
 from ojs_builder import (build_identification,
@@ -94,7 +95,7 @@ def lambda_handler(event, context):
                            "sectionAbbrev": import_row['sectionAbbrev']}
                 sections[issue_title].append(section)
                 articles[issue_title].append(import_row)
-
+    file_number = 0
     for issue_key, issue_metadata in issues.items():
         issue = ElementTree.Element("issue")
         issue.append(build_identification(issue_metadata))
@@ -110,17 +111,21 @@ def lambda_handler(event, context):
                 import_dict['submission_stage'] = 'submission'
             if import_dict['fileGenre1'] == '':
                 import_dict['fileGenre1'] = 'Article Text'
+            if import_dict['revision_number'] not in import_dict:
+                import_dict['revision_number'] = "0"
 
             import_dict['bucket_location'] = bucket_location
+            file_number += 1
+            import_dict['file_number'] = str(file_number)
             doc_articles.append(build_article(import_dict))
         issue.append(doc_articles)
         root.append(issue)
 
-    doc._setroot(root)
-    doc.write(output_file)
+    pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(root))
+    open(output_file, 'w').write((pretty_xml.toprettyxml()))
     s3_resource.meta.client.upload_file(output_file, bucket, 'conversion.xml')
     return {
         'statusCode': 200,
         'body': json.dumps('Converted:\n\t'
-                           + 'Articles: ' + str(len(articles)) + '\n\t'
+                           + 'Articles: ' + str(file_number) + '\n\t'
                            + 'Issues: ' + str(len(issues)))}

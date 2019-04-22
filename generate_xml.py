@@ -94,6 +94,11 @@ for issue_key, issue_metadata in issues.items():
             import_dict['fileGenre1'] = 'Article Text'
         if 'revision_number' not in import_dict:
             import_dict['revision_number'] = "1"
+        if import_dict['authorLastname1'] == '' or import_dict['authorLastname1'] == None or 'authorLastname1' not in import_dict:
+            import_dict['authorLastname1'] = "Unknown"
+        if import_dict['authorFirstname1'] == '' or import_dict['authorFirstname1'] == None or 'authorFirstname1' not in import_dict:
+            import_dict['authorFirstname1'] = "Unknown"
+        
 
         import_dict['bucket_location'] = bucket_location
         file_number += 1
