@@ -17,6 +17,8 @@ General Usage
 ------------
 
 **_Local Conversion_**
+  
+  _Ensure pdf_folder variable is defined correctly, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
 
 1. Copy exmaples/import.csv to ./import.csv
 
