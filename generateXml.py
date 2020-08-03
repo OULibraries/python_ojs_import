@@ -13,21 +13,21 @@ def buildSections(children):
     Returns:
     Element: XML Element Object containing OJS Sections
     """
-    tb=ET.TreeBuilder()
-    tb.start("sections",{})
+    xmlTreeBuilder = ET.TreeBuilder()
+    xmlTreeBuilder.start("sections",{})
     for i in children:
-        tb.start("section", {"ref":i['sectionAbbrev']})
-        tb.start("abbrev",{})
-        tb.data(i['sectionAbbrev'])
-        tb.end("abbrev")
-        tb.start("policy",{})
-        tb.end("policy")
-        tb.start("title",{})
-        tb.data(i['sectionTitle'])
-        tb.end("title")
-        tb.end("section")
-    tb.end("sections")
-    return(tb.close())
+        xmlTreeBuilder.start("section", {"ref":i['sectionAbbrev']})
+        xmlTreeBuilder.start("abbrev",{})
+        xmlTreeBuilder.data(i['sectionAbbrev'])
+        xmlTreeBuilder.end("abbrev")
+        xmlTreeBuilder.start("policy",{})
+        xmlTreeBuilder.end("policy")
+        xmlTreeBuilder.start("title",{})
+        xmlTreeBuilder.data(i['sectionTitle'])
+        xmlTreeBuilder.end("title")
+        xmlTreeBuilder.end("section")
+    xmlTreeBuilder.end("sections")
+    return(xmlTreeBuilder.close())
 
 def buildIdentification(children):
     """
@@ -40,22 +40,22 @@ def buildIdentification(children):
     Element: XML Element Object containing OJS Identification
     """
     
-    tb=ET.TreeBuilder()
-    tb.start("issue_identification",{})
-    tb.start("volume",{})
-    tb.data(children['issueVolume'])
-    tb.end("volume")
-    tb.start("number",{})
-    tb.data(children['issueNumber'])
-    tb.end("number")
-    tb.start("year",{})
-    tb.data(children['issueYear'])
-    tb.end("year")
-    tb.start("title",{})
-    tb.data(children['issueTitle'])
-    tb.end("title")
-    tb.end("issue_identification")
-    return tb.close()
+    xmlTreeBuilder = ET.TreeBuilder()
+    xmlTreeBuilder.start("issue_identification",{})
+    xmlTreeBuilder.start("volume",{})
+    xmlTreeBuilder.data(children['issueVolume'])
+    xmlTreeBuilder.end("volume")
+    xmlTreeBuilder.start("number",{})
+    xmlTreeBuilder.data(children['issueNumber'])
+    xmlTreeBuilder.end("number")
+    xmlTreeBuilder.start("year",{})
+    xmlTreeBuilder.data(children['issueYear'])
+    xmlTreeBuilder.end("year")
+    xmlTreeBuilder.start("title",{})
+    xmlTreeBuilder.data(children['issueTitle'])
+    xmlTreeBuilder.end("title")
+    xmlTreeBuilder.end("issue_identification")
+    return xmlTreeBuilder.close()
 
 def buildPublication(children):
     """
@@ -68,11 +68,11 @@ def buildPublication(children):
     Element: XML Element Object containing OJS Publication
     """
 
-    tb=ET.TreeBuilder()
-    tb.start("date_published",{})
-    tb.data(children['issueDatepublished'])
-    tb.end("date_published")
-    return tb.close()
+    xmlTreeBuilder = ET.TreeBuilder()
+    xmlTreeBuilder.start("date_published",{})
+    xmlTreeBuilder.data(children['issueDatepublished'])
+    xmlTreeBuilder.end("date_published")
+    return xmlTreeBuilder.close()
 
 
 
@@ -88,91 +88,91 @@ def buildArticle(children):
     Element: XML Element Object containing OJS Article
     """
     
-    tb=ET.TreeBuilder()
-    tb.start("articles",{})
-    tb.start("article", {"section_ref": children['sectionAbbrev'],"stage": "production",
+    xmlTreeBuilder = ET.TreeBuilder()
+    xmlTreeBuilder.start("articles",{})
+    xmlTreeBuilder.start("article", {"section_ref": children['sectionAbbrev'],"stage": "production",
                         "date_published": children['issueDatepublished'],
                         "seq": children['seq']})
-    tb.start("title",{})
-    tb.data(children['title'])
-    tb.end("title")
-    tb.start("abstract",{})
-    tb.data(children['abstract'])
-    tb.end("abstract")
-    # Subject/Keywords are seperated by a ';' in the spreadsheet therefore parse it
+    xmlTreeBuilder.start("title",{})
+    xmlTreeBuilder.data(children['title'])
+    xmlTreeBuilder.end("title")
+    xmlTreeBuilder.start("abstract",{})
+    xmlTreeBuilder.data(children['abstract'])
+    xmlTreeBuilder.end("abstract")
+    # Subject/Keywords are seperated by a '' in the spreadsheet therefore parse it
     if('keywords' in children):
-        keywordAry = children['keywords'].split(';')
-        tb.start('subjects',{})
+        keywordAry = children['keywords'].split('')
+        xmlTreeBuilder.start('subjects',{})
         for k in keywordAry:
-            tb.start('subject',{})
-            tb.data(k)
-            tb.end("subject")
-        tb.end("subjects")
+            xmlTreeBuilder.start('subject',{})
+            xmlTreeBuilder.data(k)
+            xmlTreeBuilder.end("subject")
+        xmlTreeBuilder.end("subjects")
     else:
-        tb.start("subjects",{})
-        tb.start("subject",{})
-        tb.end("subject")
-        tb.end("subjects")
-    tb.start("authors",{})
-    tb.start("author",{"user_group_ref":"Author"})
-    tb.start("givenname",{})
-    tb.data(children['authorgivenname1'])
-    tb.end("givenname")
-    tb.start("familyname",{})
-    tb.data(children['authorfamilyname1'])
-    tb.end("familyname")
-    tb.start("affiliation",{})
-    tb.data(children['authorAffiliation1'])
-    tb.end("affiliation")
-    tb.start("email",{})
-    tb.data(children['authorEmail1'])
-    tb.end("email")
-    tb.end("author")
-    tb.start("author",{"user_group_ref":"Author"})
-    tb.start("givenname",{})
-    tb.data(children['authorgivenname2'])
-    tb.end("givenname")
-    tb.start("familyname",{})
-    tb.data(children['authorfamilyname2'])
-    tb.end("familyname")
-    tb.start("affiliation",{})
-    tb.data(children['authorAffiliation2'])
-    tb.end("affiliation")
-    tb.start("email",{})
-    tb.data(children['authorEmail2'])
-    tb.end("email")
-    tb.end("author")
-    tb.end("authors")
-    tb.start("submission_file",    {"id": children['seq'], "stage":"proof"})
-    tb.start("revision", {"genre": children['fileGenre1'],"number": children['seq'],
+        xmlTreeBuilder.start("subjects",{})
+        xmlTreeBuilder.start("subject",{})
+        xmlTreeBuilder.end("subject")
+        xmlTreeBuilder.end("subjects")
+    xmlTreeBuilder.start("authors",{})
+    xmlTreeBuilder.start("author",{"user_group_ref":"Author"})
+    xmlTreeBuilder.start("givenname",{})
+    xmlTreeBuilder.data(children['authorgivenname1'])
+    xmlTreeBuilder.end("givenname")
+    xmlTreeBuilder.start("familyname",{})
+    xmlTreeBuilder.data(children['authorfamilyname1'])
+    xmlTreeBuilder.end("familyname")
+    xmlTreeBuilder.start("affiliation",{})
+    xmlTreeBuilder.data(children['authorAffiliation1'])
+    xmlTreeBuilder.end("affiliation")
+    xmlTreeBuilder.start("email",{})
+    xmlTreeBuilder.data(children['authorEmail1'])
+    xmlTreeBuilder.end("email")
+    xmlTreeBuilder.end("author")
+    xmlTreeBuilder.start("author",{"user_group_ref":"Author"})
+    xmlTreeBuilder.start("givenname",{})
+    xmlTreeBuilder.data(children['authorgivenname2'])
+    xmlTreeBuilder.end("givenname")
+    xmlTreeBuilder.start("familyname",{})
+    xmlTreeBuilder.data(children['authorfamilyname2'])
+    xmlTreeBuilder.end("familyname")
+    xmlTreeBuilder.start("affiliation",{})
+    xmlTreeBuilder.data(children['authorAffiliation2'])
+    xmlTreeBuilder.end("affiliation")
+    xmlTreeBuilder.start("email",{})
+    xmlTreeBuilder.data(children['authorEmail2'])
+    xmlTreeBuilder.end("email")
+    xmlTreeBuilder.end("author")
+    xmlTreeBuilder.end("authors")
+    xmlTreeBuilder.start("submission_file",    {"id": children['seq'], "stage":"proof"})
+    xmlTreeBuilder.start("revision", {"genre": children['fileGenre1'],"number": children['seq'],
     "filetype": "application/pdf", "filename": children['file1']})
-    tb.start("name",{});
-    tb.data(children['file1']);
-    tb.end("name");
-    tb.start("href", {"src": "http://ul-theatreorgan.s3-website-us-east-1.amazonaws.com/pdf/"+ children['file1']
+    xmlTreeBuilder.start("name",{})
+    xmlTreeBuilder.data(children['file1'])
+    xmlTreeBuilder.end("name")
+    xmlTreeBuilder.start("href", {"src": "http://ul-theatreorgan.s3-website-us-east-1.amazonaws.com/pdf/"+ children['file1']
     ,"mime_type": "application/pdf"})
-    tb.end("href");
-    tb.end("revision");
-    tb.end("submission_file");
-    tb.start("article_galley",{});
-    tb.start("id",{});
-    tb.data(children['seq']);
-    tb.end("id");
-    tb.start("name",{});
-    tb.data("PDF");
-    tb.end("name");
-    tb.start("seq",{});
-    tb.data(children['seq']);
-    tb.end("seq");
-    tb.start("submission_file_ref",{"id": children['seq'],"revision": children['seq']});
-    tb.end("submission_file_ref");
-    tb.end("article_galley");
-    tb.start("pages",{});
-    tb.data(children['pages']);
-    tb.end("pages");
-    tb.end("article");
-    tb.end("articles")
-    return tb.close()
+    xmlTreeBuilder.end("href")
+    xmlTreeBuilder.end("revision")
+    xmlTreeBuilder.end("submission_file")
+    xmlTreeBuilder.start("article_galley",{})
+    xmlTreeBuilder.start("id",{})
+    xmlTreeBuilder.data(children['seq'])
+    xmlTreeBuilder.end("id")
+    xmlTreeBuilder.start("name",{})
+    xmlTreeBuilder.data("PDF")
+    xmlTreeBuilder.end("name")
+    xmlTreeBuilder.start("seq",{})
+    xmlTreeBuilder.data(children['seq'])
+    xmlTreeBuilder.end("seq")
+    xmlTreeBuilder.start("submission_file_ref",{"id": children['seq'],"revision": children['seq']})
+    xmlTreeBuilder.end("submission_file_ref")
+    xmlTreeBuilder.end("article_galley")
+    xmlTreeBuilder.start("pages",{})
+    xmlTreeBuilder.data(children['pages'])
+    xmlTreeBuilder.end("pages")
+    xmlTreeBuilder.end("article")
+    xmlTreeBuilder.end("articles")
+    return xmlTreeBuilder.close()
 
 #####
 # Takes a CSV and parses it into a Python Dict containing Key,Value Mappings from CSV
@@ -183,26 +183,26 @@ def buildArticle(children):
 # import.csv: CSV containing OJS fields to conver to XML
 # conversion.xml: Resulting XML document for OJS Import 
 #####
-importlist=[]
+importlist = []
 input_file = csv.DictReader(open("import.csv"))
-issues=[]
-articles=dict()
-sections={}
-for i in input_file:
-    importlist.append(i)
+issues = []
+articles = dict()
+sections = {}
+for row in input_file:
+    importlist.append(row)
 
-for m in importlist:
-    issues.append(m['issueTitle'])
+for issueTitle in importlist:
+    issues.append(issueTitle['issueTitle'])
 
 issues = set(issues)
 
-for it in issues:
-    sections[it]=[]
+for issueTitle in issues:
+    sections[issueTitle]=[]
 
-    for o in importlist:
-        if o['issueTitle']==it:
-            section= {"sectionTitle":o['sectionTitle'], "sectionAbbrev":o['sectionAbbrev']}
-            sections[it].append(section)
+    for row in importlist:
+        if row['issueTitle'] == issueTitle:
+            section = {"sectionTitle":row['sectionTitle'], "sectionAbbrev":row['sectionAbbrev']}
+            sections[issueTitle].append(section)
 
 with open("pyout.xml", "w") as f:
     f.write("<?xml version=\"1.0\"?><issues xmlns=\"http://pkp.sfu.ca\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\"></issues>")
@@ -213,24 +213,24 @@ article = ET.parse("pyout.xml")
 
 root = article.getroot()
 for importdict in importlist:
-    articles[importdict['issueTitle']]=importdict
+    articles[importdict['issueTitle']] = importdict
 
-articles=set(articles)
-tr=ET.TreeBuilder()
-tr.start("issue",{})
-tr.end("issue")
-issue=(tr.close())
+articles = set(articles)
+xmlTree = ET.TreeBuilder()
+xmlTree.start("issue",{})
+xmlTree.end("issue")
+issue = (xmlTree.close())
 
 for importdict in importlist:
     if 'authorEmail1' not in importdict:
-        importdict['authorEmail1']=''
+        importdict['authorEmail1'] = ''
     if 'authorEmail2' not in importdict:
-        importdict['authorEmail2']=''
+        importdict['authorEmail2'] = ''
 
-    tr=ET.TreeBuilder()
-    tr.start("issue",{})
-    tr.end("issue")
-    issue=(tr.close())
+    xmlTree = ET.TreeBuilder()
+    xmlTree.start("issue",{})
+    xmlTree.end("issue")
+    issue = (xmlTree.close())
     issue.append(buildIdentification(importdict))
     issue.append(buildPublication(importdict))
     issue.append(buildSections(sections[importdict['issueTitle']]))
