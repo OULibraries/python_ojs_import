@@ -20,11 +20,7 @@ from ojs_builder import (build_identification,
                          build_sections)
 
 import_list = []
-bucket = "mybucket"
-bucket_schema = "http://"
-bucket_url = bucket + ".s3.amazonaws.com"
-bucket_prefix = "/pdf/"
-bucket_location = bucket_schema + bucket_url + bucket_prefix
+pdf_folder = os.getcwd() 
 input_csv = "import.csv"
 input_file = csv.DictReader(open(input_csv))
 output_file = "conversion.xml"
@@ -88,7 +84,7 @@ for issue_key, issue_metadata in issues.items():
             import_dict['authorGivenname1'] = "Unknown"
         
 
-        import_dict['bucket_location'] = bucket_location
+        import_dict['pdf_folder'] = pdf_folder + "/"
         file_number += 1
         import_dict['file_number'] = str(file_number)
         doc_articles.append(build_article(import_dict))

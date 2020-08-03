@@ -17,12 +17,18 @@ General Usage
 ------------
 
 **_Local Conversion_**
-  
-  _Ensure pdf_folder variable is defined correctly, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
+
+>Local conversion can using a local directory as the source for PDF files by using the generate_xml_embedded.py script
+
+>* **NOTE: When locally embedding PDF's this may result in a very large XML that cannot be uploaded and smaller "batches" must be done** 
+
+>* _Ensure pdf_folder variable is defined correctly, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
 
 1. Copy exmaples/import.csv to ./import.csv
 
 2. Add meta-data to respective CSV fields
+
+4. Upload PDF files to PDF directory in defined S3 Bucket
 
 3. Run generate_xml.py, this will create an XML file named `conversion.xml`
 
