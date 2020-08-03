@@ -56,7 +56,7 @@ General Usage
 _You may recieve warnings stating:_
 > Existing issue with id ### matches the given issue identification "<issue_identification><volume>##</volume><number>##</number><year>#####</year><title/></issue_identification>". This issue will not be modified, but articles will be added.
 
-_This is OJS telling you that the issue exists but it is importing approprate Article Metadata_
+_This is OJS telling you that the issue exists but it is importing approprate Article Metadata; it should be noted that this can result in duplicate articles if they are imported more than once_
 
 _Further information is located below indicating completed imports_
 > The import completed successfully. The following items were imported:
