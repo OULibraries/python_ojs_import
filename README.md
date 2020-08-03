@@ -18,11 +18,11 @@ General Usage
 
 **_Local Conversion_**
 
->Local conversion can using a local directory as the source for PDF files by using the generate_xml_embedded.py script
+>Local conversion can use a local directory as the source for PDF files by using the generate_xml_embedded.py script
 
 >* **NOTE: When locally embedding PDF's this may result in a very large XML that cannot be uploaded and smaller "batches" must be done** 
 
->* _Ensure pdf_folder variable is defined correctly, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
+>* _Ensure pdf_folder variable is defined correctly when using generate_xml_embedded.py, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
 
 1. Copy exmaples/import.csv to ./import.csv
 
