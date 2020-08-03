@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 
 
 def buildSections(children):
-     """
+    """
     Build OJS Sections XML Element
 
     Parameters:
@@ -13,24 +13,24 @@ def buildSections(children):
     Returns:
     Element: XML Element Object containing OJS Sections
     """
-        tb=ET.TreeBuilder()
-        tb.start("sections",{})
-        for i in children:
-            tb.start("section", {"ref":i['sectionAbbrev']})
-            tb.start("abbrev",{})
-            tb.data(i['sectionAbbrev'])
-            tb.end("abbrev")
-            tb.start("policy",{})
-            tb.end("policy")
-            tb.start("title",{})
-            tb.data(i['sectionTitle'])
-            tb.end("title")
-            tb.end("section")
-        tb.end("sections")
-        return(tb.close())
+    tb=ET.TreeBuilder()
+    tb.start("sections",{})
+    for i in children:
+        tb.start("section", {"ref":i['sectionAbbrev']})
+        tb.start("abbrev",{})
+        tb.data(i['sectionAbbrev'])
+        tb.end("abbrev")
+        tb.start("policy",{})
+        tb.end("policy")
+        tb.start("title",{})
+        tb.data(i['sectionTitle'])
+        tb.end("title")
+        tb.end("section")
+    tb.end("sections")
+    return(tb.close())
 
 def buildIdentification(children):
-     """
+    """
     Build OJS Identification XML Element
 
     Parameters:
@@ -58,7 +58,7 @@ def buildIdentification(children):
     return tb.close()
 
 def buildPublication(children):
-     """
+    """
     Build OJS Publication XML Element
 
     Parameters:
@@ -78,7 +78,7 @@ def buildPublication(children):
 
 
 def buildArticle(children):
- """
+    """
     Build OJS Article XML Element
 
     Parameters:
