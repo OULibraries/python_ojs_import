@@ -5,11 +5,13 @@
  The final XML Tree that is built is then dumped to a file for import into OJS
 
  Vars:
+    pdf_folder: Full path to directory containing article/issue PDF's, defaults to current working directory
     input_csv: CSV containing OJS fields to conver to XML
     output_file: Resulting XML document for OJS Import
 """
 
 import csv
+import os
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
 from ojs_builder import (build_identification,
@@ -17,23 +19,8 @@ from ojs_builder import (build_identification,
                          build_article,
                          build_sections)
 
-
-"""
-AWS Lambda Hanlder Function, main driver for Lambda.
-Parameters:
-event : Source that triggered Lambda Function;in this case CSV Upload to S3
-context: This object provides methods, properties, and information
-         about the invocation, function, and execution environment.
-
-Returns:
-json: Response and Status of Lambda Function
-"""
 import_list = []
-bucket = "mybucket"
-bucket_schema = "http://"
-bucket_url = bucket + ".s3.amazonaws.com"
-bucket_prefix = "/pdf/"
-bucket_location = bucket_schema + bucket_url + bucket_prefix
+pdf_folder = os.getcwd() 
 input_csv = "import.csv"
 input_file = csv.DictReader(open(input_csv))
 output_file = "conversion.xml"
@@ -50,9 +37,6 @@ xml_header = (xml_version + " <issues " + xmlns
 ElementTree.register_namespace("", "http://pkp.sfu.ca")
 doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
 root = doc.getroot()
-
-# Tag Uploaded CSV for object lifecycle management
-key = 'csv/import.csv'
 
 for row in input_file:
     import_list.append(row)
@@ -100,7 +84,7 @@ for issue_key, issue_metadata in issues.items():
             import_dict['authorGivenname1'] = "Unknown"
         
 
-        import_dict['bucket_location'] = bucket_location
+        import_dict['pdf_folder'] = pdf_folder + "/"
         file_number += 1
         import_dict['file_number'] = str(file_number)
         doc_articles.append(build_article(import_dict))
