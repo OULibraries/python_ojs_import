@@ -17,7 +17,8 @@ import xml.etree.ElementTree as ElementTree
 from ojs_builder import (build_identification,
                          build_publication,
                          build_article,
-                         build_sections)
+                         build_sections,
+                         build_cover)
 
 import_list = []
 pdf_folder = os.getcwd() 
@@ -48,7 +49,8 @@ for import_dict in import_list:
             "issueVolume": import_dict['issueVolume'],
             "issueNumber": import_dict['issueNumber'],
             "issueDatepublished": import_dict['issueDatepublished'],
-            "issueTitle": import_dict['issueTitle']}
+            "issueTitle": import_dict['issueTitle'],
+            "issueCover": import_dict['issueCover']}
 
 for issue_title in issues:
     sections[issue_title] = []
@@ -66,6 +68,8 @@ for issue_key, issue_metadata in issues.items():
     issue.append(build_identification(issue_metadata))
     issue.append(build_publication(issue_metadata))
     issue.append(build_sections(sections[issue_key]))
+    if issue_metadata['issueCover'] != '':
+        issue.append(build_cover(issue_metadata))
     doc_articles = ElementTree.Element("articles")
     for import_dict in articles[issue_key]:
         if 'authorEmail1' not in import_dict:

@@ -68,8 +68,28 @@ def build_identification(children):
     TREE_BUILDER.data(children['issueTitle'])
     TREE_BUILDER.end("title")
     TREE_BUILDER.end("issue_identification")
+ 
     return TREE_BUILDER.close()
 
+def build_cover(children):
+    TREE_BUILDER = ElementTree.TreeBuilder()
+    TREE_BUILDER.start("covers")
+    TREE_BUILDER.start("cover")
+    TREE_BUILDER.start("cover_image")
+    TREE_BUILDER.data(children['issueCover'])
+    TREE_BUILDER.end("cover_image")
+    TREE_BUILDER.start("cover_image_alt_text")
+    TREE_BUILDER.data("")
+    TREE_BUILDER.end("cover_image_alt_text")
+    TREE_BUILDER.start("embed", {
+            "encoding": "base64",
+            "mime_type": "application/pdf"
+        })
+    TREE_BUILDER.data(str(base64.b64encode(open(children['issueCover'], "rb").read()), "utf-8"))
+    TREE_BUILDER.end("embed")
+    TREE_BUILDER.end("cover")
+    TREE_BUILDER.end("covers")
+    return TREE_BUILDER.close()
 
 def build_publication(children):
     """
@@ -87,6 +107,7 @@ def build_publication(children):
     TREE_BUILDER.start("date_published", {})
     TREE_BUILDER.data(children['issueDatepublished'])
     TREE_BUILDER.end("date_published")
+
     return TREE_BUILDER.close()
 
 
