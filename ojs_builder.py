@@ -10,7 +10,7 @@
 """
 
 import xml.etree.ElementTree as ElementTree
-
+import base64
 
 def build_sections(children):
     """
@@ -81,9 +81,10 @@ def build_cover(children):
     TREE_BUILDER.end("cover_image_alt_text")
     TREE_BUILDER.start("embed", {
             "encoding": "base64",
-            "mime_type": "application/pdf"
+            "mime_type": "image/jpeg"
         })
-    TREE_BUILDER.data(str(base64.b64encode(open(children['issueCover'], "rb").read()), "utf-8"))
+    TREE_BUILDER.data(str(base64.b64encode(open('/tmp/covers/'
+        + children['issueCover'], "rb").read()), "utf-8"))
     TREE_BUILDER.end("embed")
     TREE_BUILDER.end("cover")
     TREE_BUILDER.end("covers")
@@ -170,7 +171,7 @@ def build_article(children):
     TREE_BUILDER.data(children['authorEmail1'])
     TREE_BUILDER.end("email")
     TREE_BUILDER.end("author")
-    if children['authorGivenname2'] is not '':
+    if children['authorGivenname2'] != '':
         TREE_BUILDER.start("author", {"user_group_ref": "Author"})
         TREE_BUILDER.start("givenname", {"locale":"en_US"})
         TREE_BUILDER.data(children['authorGivenname2'])
