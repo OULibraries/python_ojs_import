@@ -10,7 +10,6 @@
 """
 
 import xml.etree.ElementTree as ElementTree
-import base64
 
 
 def build_sections(children):
@@ -68,7 +67,6 @@ def build_identification(children):
     TREE_BUILDER.data(children['issueTitle'])
     TREE_BUILDER.end("title")
     TREE_BUILDER.end("issue_identification")
- 
     return TREE_BUILDER.close()
 
 def build_cover(children):
@@ -107,7 +105,6 @@ def build_publication(children):
     TREE_BUILDER.start("date_published", {})
     TREE_BUILDER.data(children['issueDatepublished'])
     TREE_BUILDER.end("date_published")
-
     return TREE_BUILDER.close()
 
 
@@ -202,19 +199,11 @@ def build_article(children):
     TREE_BUILDER.start("name", {})
     TREE_BUILDER.data(children['file1'])
     TREE_BUILDER.end("name")
-    if 'bucket_location' in children:
-        TREE_BUILDER.start("href", {
-            "src": children['bucket_location'] + children['file1'],
-            "mime_type": "application/pdf"
-        })
-        TREE_BUILDER.end("href")
-    if 'pdf_folder' in children:
-        TREE_BUILDER.start("embed", {
-            "encoding": "base64",
-            "mime_type": "application/pdf"
-        })
-        TREE_BUILDER.data(str(base64.b64encode(open(children['pdf_folder'] + children['file1'], "rb").read()), "utf-8"))
-        TREE_BUILDER.end("embed")
+    TREE_BUILDER.start("href", {
+        "src": children['bucket_location'] + children['file1'],
+        "mime_type": "application/pdf"
+    })
+    TREE_BUILDER.end("href")
     TREE_BUILDER.end("revision")
     TREE_BUILDER.end("submission_file")
     TREE_BUILDER.start("article_galley", {})
@@ -238,3 +227,4 @@ def build_article(children):
     TREE_BUILDER.end("pages")
     TREE_BUILDER.end("article")
     return TREE_BUILDER.close()
+
