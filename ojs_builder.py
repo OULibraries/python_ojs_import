@@ -11,6 +11,7 @@
 
 import xml.etree.ElementTree as ElementTree
 import base64
+import requests
 
 def build_sections(children):
     """
@@ -83,8 +84,8 @@ def build_cover(children):
             "encoding": "base64",
             "mime_type": "image/jpeg"
         })
-    TREE_BUILDER.data(str(base64.b64encode(open('/tmp/covers/'
-        + children['issueCover'], "rb").read()), "utf-8"))
+    TREE_BUILDER.data(str(base64.b64encode(requests.get('https://ul-theatreorgan.s3.amazonaws.com/pdf/'
+        + children['issueCover']).content), "utf-8"))
     TREE_BUILDER.end("embed")
     TREE_BUILDER.end("cover")
     TREE_BUILDER.end("covers")
