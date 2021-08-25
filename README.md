@@ -12,6 +12,7 @@ This role requires the following Python Plugins:
   * Boto3
       Can be installed using `pip install boto3`, [ visit pip installation instructions for more information.](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#installation)  
   * XML ElementTree (Part of Python Core)
+  * requests
 
 General Usage
 ------------
@@ -24,9 +25,9 @@ General Usage
 
 >* _Ensure pdf_folder variable is defined correctly when using generate_xml_embedded.py, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
 
-1. Copy exmaples/import.csv to ./import.csv
+1. Copy examples/import.csv to ./import.csv
 
-2. Add meta-data to respective CSV fields
+2. Add metadata to respective CSV fields
 
 4. Upload PDF files to PDF directory in defined S3 Bucket
 
