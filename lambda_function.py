@@ -14,10 +14,12 @@ import csv
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
 import boto3
+import datetime
 from ojs_builder import (build_identification,
                          build_publication,
                          build_article,
-                         build_sections)
+                         build_sections,
+                         build_cover)
 
 
 def lambda_handler(event, context):
@@ -32,7 +34,7 @@ def lambda_handler(event, context):
     json: Response and Status of Lambda Function
     """
     import_list = []
-    bucket = "mybucket"
+    bucket = "ul-theatreorgan"
     bucket_schema = "http://"
     bucket_url = bucket + ".s3.amazonaws.com"
     bucket_prefix = "/pdf/"
@@ -84,7 +86,8 @@ def lambda_handler(event, context):
                 "issueVolume": import_dict['issueVolume'],
                 "issueNumber": import_dict['issueNumber'],
                 "issueDatepublished": import_dict['issueDatepublished'],
-                "issueTitle": import_dict['issueTitle']}
+                "issueTitle": import_dict['issueTitle'],
+                "issueCover": import_dict['issueCover']}
 
     for issue_title in issues:
         sections[issue_title] = []
@@ -97,10 +100,16 @@ def lambda_handler(event, context):
                 articles[issue_title].append(import_row)
     file_number = 0
     for issue_key, issue_metadata in issues.items():
-        issue = ElementTree.Element("issue")
+        if datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") < datetime.datetime.today():
+            is_published = 1
+        elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():
+            is_published = 0
+        issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
         issue.append(build_identification(issue_metadata))
         issue.append(build_publication(issue_metadata))
         issue.append(build_sections(sections[issue_key]))
+        if issue_metadata['issueCover'] != '':
+            issue.append(build_cover(issue_metadata))
         doc_articles = ElementTree.Element("articles")
         for import_dict in articles[issue_key]:
             if 'authorEmail1' not in import_dict:
@@ -111,8 +120,12 @@ def lambda_handler(event, context):
                 import_dict['submission_stage'] = 'submission'
             if import_dict['fileGenre1'] == '':
                 import_dict['fileGenre1'] = 'Article Text'
-            if import_dict['revision_number'] not in import_dict:
-                import_dict['revision_number'] = "0"
+            if 'revision_number' not in import_dict:
+                import_dict['revision_number'] = "1"
+            if import_dict['authorFamilyname1'] == '' or import_dict['authorFamilyname1'] == None or 'authorFamilyname1' not in import_dict:
+                import_dict['authorFamilyname1'] = "Unknown"
+            if import_dict['authorGivenname1'] == '' or import_dict['authorGivenname1'] == None or 'authorGivenname1' not in import_dict:
+                import_dict['authorGivenname1'] = "Unknown"
 
             import_dict['bucket_location'] = bucket_location
             file_number += 1
@@ -129,3 +142,4 @@ def lambda_handler(event, context):
         'body': json.dumps('Converted:\n\t'
                            + 'Articles: ' + str(file_number) + '\n\t'
                            + 'Issues: ' + str(len(issues)))}
+
