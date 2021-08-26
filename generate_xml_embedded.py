@@ -21,7 +21,7 @@ from ojs_builder import (build_identification,
                          build_cover)
 
 import_list = []
-pdf_folder = os.getcwd() 
+pdf_folder = os.getcwd() + '/' + 'pdf/' 
 input_csv = "import.csv"
 input_file = csv.DictReader(open(input_csv))
 output_file = "conversion.xml"
