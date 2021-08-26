@@ -12,7 +12,7 @@ This role requires the following Python Plugins:
   * Boto3
       Can be installed using `pip install boto3`, [ visit pip installation instructions for more information.](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#installation)  
   * XML ElementTree (Part of Python Core)
-  * requests
+  * urllib3
 
 General Usage
 ------------
@@ -21,9 +21,9 @@ General Usage
 
 >Local conversion can use a local directory as the source for PDF files by using the generate_xml_embedded.py script
 
->* **NOTE: When locally embedding PDF's this may result in a very large XML that cannot be uploaded and smaller "batches" must be done** 
+>* **NOTE: When locally embedding PDFs this may result in a very large XML that cannot be uploaded and smaller "batches" must be done** 
 
->* _Ensure pdf_folder variable is defined correctly when using generate_xml_embedded.py, by default the script will utilize the current directory it is ran in and will look for respective PDF files there._
+>* _Ensure pdf_folder variable is defined correctly when using generate_xml_embedded.py, by default the script will utilize a directory entitled `pdf/` located in the current directory it is run in and will look for respective PDF files there._
 
 1. Copy examples/import.csv to ./import.csv
 
@@ -31,7 +31,7 @@ General Usage
 
 4. Upload PDF files to PDF directory in defined S3 Bucket
 
-3. Run generate_xml.py, this will create an XML file named `conversion.xml`
+3. Run `generate_xml.py`. This will create an XML file named `conversion.xml`
 
 
 
@@ -39,7 +39,7 @@ General Usage
 
 1. Copy exmaples/import.csv to ./import.csv
 
-2. Add meta-data to respective CSV fields
+2. Add metadata to respective CSV fields
 
 3. Upload PDF files to PDF directory in provided S3 Bucket
  * Upload CSV to Provided S3 Bucket
