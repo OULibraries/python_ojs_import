@@ -83,3 +83,12 @@ _Further information is located below indicating completed imports_
 > Vol 17 No 10 (1975)
 
 > Vol 17 No 10 (1975)
+
+Data Entry
+------------
+1. The current version of the function requires issueTitle to be filled for
+each record. They must be the same for each record in the issue.
+
+2. issueDate must follow the ISO 8601 format for the program to create the
+   `conversion.xml` file.
+
