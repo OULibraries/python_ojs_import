@@ -76,9 +76,13 @@ def lambda_handler(event, context):
         }
     )
 
+    # Add CSV records as dictionaries to import_list
     for row in input_file:
         import_list.append(row)
 
+    # Check to see if record is already in issues dictionary.
+    # If not, add the following metadata from import_list to
+    # a new_dictionary in issues.
     for import_dict in import_list:
         if import_dict['issueTitle'] not in issues:
             issues[import_dict['issueTitle']] = {
@@ -100,6 +104,9 @@ def lambda_handler(event, context):
                 articles[issue_title].append(import_row)
     file_number = 0
     for issue_key, issue_metadata in issues.items():
+        # The issue element in the resulting XML can take a published attribute
+        # of either a 0 or a 1. This logic tells OJS whether the article should
+        # show as published or not in OJS.
         if datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") < datetime.datetime.today():
             is_published = 1
         elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():

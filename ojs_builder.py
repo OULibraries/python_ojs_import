@@ -90,6 +90,10 @@ def build_cover(children):
             "encoding": "base64",
             "mime_type": "image/jpeg"
         })
+    # OJS expects cover images to be encoded in the XML as base64. The code
+    # below retrieves the relevant cover images from the s3 bucket using the
+    # urllib3 library, encodes the image, and converts it to a string to be
+    # appended to the embed XML element.
     TREE_BUILDER.data(str(base64.b64encode(http.request('GET', 'https://ul-theatreorgan.s3.amazonaws.com/pdf/'
         + children['issueCover']).data), "utf-8"))
     TREE_BUILDER.end("embed")
@@ -207,8 +211,11 @@ def build_article(children):
     TREE_BUILDER.start("name", {})
     TREE_BUILDER.data(children['file1'])
     TREE_BUILDER.end("name")
+    # When using this file in conjunction with the generate_xml_embedded.py
+    # script to create the XML file locally, bucket_location below needs 
+    # to be switched to pdf_folder.
     TREE_BUILDER.start("href", {
-        "src": children['pdf_folder'] + children['file1'],
+        "src": children['bucket_location'] + children['file1'],
         "mime_type": "application/pdf"
     })
     TREE_BUILDER.end("href")
