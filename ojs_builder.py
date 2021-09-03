@@ -133,13 +133,11 @@ def build_article(children):
     """
 
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("article", {
-        "section_ref": children['sectionAbbrev'],
-        "stage": "production",
+    TREE_BUILDER.start("article", {"stage": "production"})
+    TREE_BUILDER.start("publication", {
         "date_published": children['issueDatepublished'],
         "seq": children['seq']
-        }
-                      )
+    })
     TREE_BUILDER.start("title", {})
     TREE_BUILDER.data(children['title'])
     TREE_BUILDER.end("title")
@@ -198,6 +196,7 @@ def build_article(children):
         TREE_BUILDER.end("email")
         TREE_BUILDER.end("author")
     TREE_BUILDER.end("authors")
+    TREE_BUILDER.end("publication")    
     TREE_BUILDER.start("submission_file", {
         "id": children['file_number'],
         "stage": children['submission_stage']
@@ -215,6 +214,7 @@ def build_article(children):
     # script to create the XML file locally, bucket_location below needs 
     # to be switched to pdf_folder.
     TREE_BUILDER.start("href", {
+        "section_ref": children['sectionAbbrev'],
         "src": children['bucket_location'] + children['file1'],
         "mime_type": "application/pdf"
     })

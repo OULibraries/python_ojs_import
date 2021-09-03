@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ElementTree
 import boto3
 import datetime
 from ojs_builder import (build_identification,
-                         build_publication,
+                         build_date_published,
                          build_article,
                          build_sections,
                          build_cover)
