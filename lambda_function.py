@@ -113,7 +113,7 @@ def lambda_handler(event, context):
             is_published = 0
         issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
         issue.append(build_identification(issue_metadata))
-        issue.append(build_publication(issue_metadata))
+        issue.append(build_date_published(issue_metadata))
         issue.append(build_sections(sections[issue_key]))
         if issue_metadata['issueCover'] != '':
             issue.append(build_cover(issue_metadata))

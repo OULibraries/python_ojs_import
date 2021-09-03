@@ -101,7 +101,7 @@ def build_cover(children):
     TREE_BUILDER.end("covers")
     return TREE_BUILDER.close()
 
-def build_publication(children):
+def build_date_published(children):
     """
     Build OJS Publication XML Element
 
