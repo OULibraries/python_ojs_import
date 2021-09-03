@@ -233,7 +233,6 @@ def build_article(children):
     TREE_BUILDER.end("seq")
     TREE_BUILDER.start("submission_file_ref", {
         "id": children['file_number'],
-        "revision": children['revision_number']
     })
     TREE_BUILDER.end("submission_file_ref")
     TREE_BUILDER.end("article_galley")
