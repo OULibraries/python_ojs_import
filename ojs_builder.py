@@ -136,7 +136,8 @@ def build_article(children):
     TREE_BUILDER.start("article", {"stage": "production"})
     TREE_BUILDER.start("publication", {
         "date_published": children['issueDatepublished'],
-        "seq": children['seq']
+        "seq": children['seq'],
+        "section_ref": children['sectionAbbrev']
     })
     TREE_BUILDER.start("title", {})
     TREE_BUILDER.data(children['title'])
@@ -166,7 +167,11 @@ def build_article(children):
         TREE_BUILDER.end("subject")
         TREE_BUILDER.end("subjects")
     TREE_BUILDER.start("authors", {"xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation":"http://pkp.sfu.ca native.xsd"})
-    TREE_BUILDER.start("author", {"user_group_ref": "Author"})
+    TREE_BUILDER.start("author", {
+        "user_group_ref": "Author",
+        "seq": 1,
+        "id": ""
+        })
     TREE_BUILDER.start("givenname", {"locale":"en_US"})
     TREE_BUILDER.data(children['authorGivenname1'])
     TREE_BUILDER.end("givenname")
@@ -181,7 +186,11 @@ def build_article(children):
     TREE_BUILDER.end("email")
     TREE_BUILDER.end("author")
     if children['authorGivenname2'] != '':
-        TREE_BUILDER.start("author", {"user_group_ref": "Author"})
+        TREE_BUILDER.start("author", {
+            "user_group_ref": "Author",
+            "seq": 2,
+            "id": ""
+            })
         TREE_BUILDER.start("givenname", {"locale":"en_US"})
         TREE_BUILDER.data(children['authorGivenname2'])
         TREE_BUILDER.end("givenname")
