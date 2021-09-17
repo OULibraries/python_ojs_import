@@ -28,13 +28,15 @@ def build_issue_id(issue_id):
     Returns:
         Element: XML Element Object containing id child element for issue element.
     """
+    issue_id_string = str(issue_id)
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("id", {"type":"internal", "advice":"ignore"})
-    TREE_BUILDER.data(issue_id)
+    TREE_BUILDER.data(issue_id_string)
     TREE_BUILDER.end("id")
+    return TREE_BUILDER.close()
 
 
-def build_issue_galleys(namespace, schema):
+def build_issue_galleys():
     """
     Returns:
         Element: Empty XML Element Object.
@@ -44,9 +46,14 @@ def build_issue_galleys(namespace, schema):
     """
 
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("issue_galleys", {"xmlns:xsi": namespace, "xsi:schemaLocation": schema})
+    TREE_BUILDER.start("issue_galleys", {
+        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
+        })
     TREE_BUILDER.data("")
     TREE_BUILDER.end("issue_galleys")
+    return TREE_BUILDER.close()
+
 
 def build_sections(children):
     """
@@ -61,17 +68,20 @@ def build_sections(children):
     """
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("sections", {})
+    section_id = 1
     for element in children:
         TREE_BUILDER.start("section", {"ref": element['sectionAbbrev']})
-        TREE_BUILDER.start("abbrev", {})
+        TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
+        TREE_BUILDER.data(str(section_id))
+        TREE_BUILDER.end("id")
+        TREE_BUILDER.start("abbrev", {"locale": "en_US"})
         TREE_BUILDER.data(element['sectionAbbrev'])
         TREE_BUILDER.end("abbrev")
-        TREE_BUILDER.start("policy", {})
-        TREE_BUILDER.end("policy")
-        TREE_BUILDER.start("title", {})
+        TREE_BUILDER.start("title", {"locale": "en_US"})
         TREE_BUILDER.data(element['sectionTitle'])
         TREE_BUILDER.end("title")
         TREE_BUILDER.end("section")
+        section_id += 1
     TREE_BUILDER.end("sections")
     return TREE_BUILDER.close()
 
@@ -164,12 +174,50 @@ def build_article(children):
     """
 
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("article", {"stage": "production"})
+    TREE_BUILDER.start("article", {"status": "3", "current_publication_id": children['file_number'], "stage": "production"})
+    TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
+    TREE_BUILDER.data(children["file_number"])
+    TREE_BUILDER.end("id")
+    TREE_BUILDER.start("submission_file", {
+        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "stage": children['submission_stage'],
+        "id": children['file_number'],
+        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
+    })
+    TREE_BUILDER.start("revision", {
+        "number": children['revision_number'],
+        "genre": children['fileGenre1'],
+        "filename": children['file1'],
+        "viewable": "true",
+        "filetype": "application/pdf",
+        "uploader": "testsoonermagazineadmin"
+    })
+    TREE_BUILDER.start("name", {"locale": "en_US"})
+    TREE_BUILDER.data(children['file1'])
+    TREE_BUILDER.end("name")
+    # When using this file in conjunction with the generate_xml_embedded.py
+    # script to create the XML file locally, bucket_location below needs
+    # to be switched to pdf_folder.
+    TREE_BUILDER.start("href", {
+        #"section_ref": children['sectionAbbrev'],
+        "src": children['bucket_location'] + children['file1'],
+        "mime_type": "application/pdf"
+    })
+    TREE_BUILDER.end("href")
+    TREE_BUILDER.end("revision")
+    TREE_BUILDER.end("submission_file")
     TREE_BUILDER.start("publication", {
+        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "locale": "en_US",
+        "version": "1",
+        "status": "3",
         "date_published": children['issueDatepublished'],
         "seq": children['seq'],
         "section_ref": children['sectionAbbrev']
     })
+    TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
+    TREE_BUILDER.data(children['file_number'])
+    TREE_BUILDER.end("id")
     TREE_BUILDER.start("title", {})
     TREE_BUILDER.data(children['title'])
     TREE_BUILDER.end("title")
@@ -197,11 +245,12 @@ def build_article(children):
         TREE_BUILDER.start("subject", {})
         TREE_BUILDER.end("subject")
         TREE_BUILDER.end("subjects")
-    TREE_BUILDER.start("authors", {"xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation":"http://pkp.sfu.ca native.xsd"})
+    TREE_BUILDER.start("authors", {})
     TREE_BUILDER.start("author", {
+        "include_in_browse": "true",
         "user_group_ref": "Author",
         "seq": "1",
-        "id": "0"
+        "id": "1"
         })
     TREE_BUILDER.start("givenname", {"locale":"en_US"})
     TREE_BUILDER.data(children['authorGivenname1'])
@@ -220,7 +269,7 @@ def build_article(children):
         TREE_BUILDER.start("author", {
             "user_group_ref": "Author",
             "seq": "2",
-            "id": "0"
+            "id": "2"
             })
         TREE_BUILDER.start("givenname", {"locale":"en_US"})
         TREE_BUILDER.data(children['authorGivenname2'])
@@ -236,36 +285,16 @@ def build_article(children):
         TREE_BUILDER.end("email")
         TREE_BUILDER.end("author")
     TREE_BUILDER.end("authors")
-    TREE_BUILDER.end("publication")    
-    TREE_BUILDER.start("submission_file", {
-        "id": children['file_number'],
-        "stage": children['submission_stage']
-        })
-    TREE_BUILDER.start("revision", {
-        "genre": children['fileGenre1'],
-        "number": children['revision_number'],
-        "filetype": "application/pdf",
-        "filename": children['file1']
-        })
-    TREE_BUILDER.start("name", {})
-    TREE_BUILDER.data(children['file1'])
-    TREE_BUILDER.end("name")
-    # When using this file in conjunction with the generate_xml_embedded.py
-    # script to create the XML file locally, bucket_location below needs 
-    # to be switched to pdf_folder.
-    TREE_BUILDER.start("href", {
-        "section_ref": children['sectionAbbrev'],
-        "src": children['bucket_location'] + children['file1'],
-        "mime_type": "application/pdf"
+    TREE_BUILDER.start("article_galley", {
+        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "locale": "en_US",
+        "approved": "false",
+        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
     })
-    TREE_BUILDER.end("href")
-    TREE_BUILDER.end("revision")
-    TREE_BUILDER.end("submission_file")
-    TREE_BUILDER.start("article_galley", {})
-    TREE_BUILDER.start("id", {})
+    TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
     TREE_BUILDER.data(children['file_number'])
     TREE_BUILDER.end("id")
-    TREE_BUILDER.start("name", {})
+    TREE_BUILDER.start("name", {"locale": "en_US"})
     TREE_BUILDER.data("PDF")
     TREE_BUILDER.end("name")
     TREE_BUILDER.start("seq", {})
@@ -273,12 +302,14 @@ def build_article(children):
     TREE_BUILDER.end("seq")
     TREE_BUILDER.start("submission_file_ref", {
         "id": children['file_number'],
+        "revision": "1"
     })
     TREE_BUILDER.end("submission_file_ref")
     TREE_BUILDER.end("article_galley")
     TREE_BUILDER.start("pages", {})
     TREE_BUILDER.data(children['pages'])
     TREE_BUILDER.end("pages")
+    TREE_BUILDER.end("publication")
     TREE_BUILDER.end("article")
     return TREE_BUILDER.close()
 

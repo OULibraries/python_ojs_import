@@ -59,9 +59,9 @@ def lambda_handler(event, context):
     xml_header = (xml_version + " <issues " + xmlns
                   + " " + xmlns_xsi + " " + schema_location + "</issues>")
 
-    ElementTree.register_namespace("", "http://pkp.sfu.ca")
-    doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
-    root = doc.getroot()
+    #ElementTree.register_namespace("", "http://pkp.sfu.ca")
+    #doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+    #root = doc.getroot()
 
     # Tag Uploaded CSV for object lifecycle management
     key = 'csv/import.csv'
@@ -107,6 +107,9 @@ def lambda_handler(event, context):
     file_number = 0
     issue_identifier = 1
     for issue_key, issue_metadata in issues.items():
+        ElementTree.register_namespace("", "http://pkp.sfu.ca")
+        doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+        root = doc.getroot()
         # The issue element in the resulting XML can take a published attribute
         # of either a 0 or a 1. This logic tells OJS whether the article should
         # show as published or not in OJS.
@@ -115,18 +118,15 @@ def lambda_handler(event, context):
         elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():
             is_published = 0
         issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
-        issue.append(build_issue_id(str(issue_identifier)))
+        issue.append(build_issue_id(issue_identifier))
 
-        # Increment the issue identifier to create a unique ID for each issue on the fly.
-        # As of version 3.2.1-4, OJS requires these elements.
-        issue_identifier += 1
         issue.append(build_identification(issue_metadata))
         issue.append(build_date_published(issue_metadata))
         issue.append(build_sections(sections[issue_key]))
         if issue_metadata['issueCover'] != '':
             issue.append(build_cover(issue_metadata))
-        issue.append(build_issue_galleys(xmlns_xsi, schema_location))
-        doc_articles = ElementTree.Element("articles", {"xmlns:xsi": xmlns_xsi, "xsi:schemaLocation": schema_location})
+        issue.append(build_issue_galleys())
+        doc_articles = ElementTree.Element("articles", {})
         for import_dict in articles[issue_key]:
             if 'authorEmail1' not in import_dict:
                 import_dict['authorEmail1'] = ''
@@ -150,9 +150,16 @@ def lambda_handler(event, context):
         issue.append(doc_articles)
         root.append(issue)
 
-    pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(root))
-    open(output_file, 'w').write((pretty_xml.toprettyxml()))
-    s3_resource.meta.client.upload_file(output_file, bucket, 'conversion.xml')
+        conversion_file = "conversion" + str(issue_identifier) + ".xml"
+        output_file = "/tmp/" + conversion_file
+
+        # Increment the issue identifier to create a unique ID for each issue on the fly.
+        # As of version 3.2.1-4, OJS requires these elements.
+        issue_identifier += 1
+
+        pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(root))
+        open(output_file, 'w').write((pretty_xml.toprettyxml()))
+        s3_resource.meta.client.upload_file(output_file, bucket, conversion_file)
     return {
         'statusCode': 200,
         'body': json.dumps('Converted:\n\t'
