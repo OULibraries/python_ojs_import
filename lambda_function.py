@@ -19,7 +19,9 @@ from ojs_builder import (build_identification,
                          build_date_published,
                          build_article,
                          build_sections,
-                         build_cover)
+                         build_cover,
+                         build_issue_galleys,
+                         build_issue_id)
 
 
 def lambda_handler(event, context):
@@ -103,6 +105,7 @@ def lambda_handler(event, context):
                 sections[issue_title].append(section)
                 articles[issue_title].append(import_row)
     file_number = 0
+    issue_identifier = 1
     for issue_key, issue_metadata in issues.items():
         # The issue element in the resulting XML can take a published attribute
         # of either a 0 or a 1. This logic tells OJS whether the article should
@@ -112,12 +115,18 @@ def lambda_handler(event, context):
         elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():
             is_published = 0
         issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
+        issue.append(build_issue_id(str(issue_identifier)))
+
+        # Increment the issue identifier to create a unique ID for each issue on the fly.
+        # As of version 3.2.1-4, OJS requires these elements.
+        issue_identifier += 1
         issue.append(build_identification(issue_metadata))
         issue.append(build_date_published(issue_metadata))
         issue.append(build_sections(sections[issue_key]))
         if issue_metadata['issueCover'] != '':
             issue.append(build_cover(issue_metadata))
-        doc_articles = ElementTree.Element("articles")
+        issue.append(build_issue_galleys(xmlns_xsi, schema_location))
+        doc_articles = ElementTree.Element("articles", {"xmlns:xsi": xmlns_xsi, "xsi:schemaLocation": schema_location})
         for import_dict in articles[issue_key]:
             if 'authorEmail1' not in import_dict:
                 import_dict['authorEmail1'] = ''

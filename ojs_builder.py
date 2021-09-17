@@ -19,6 +19,35 @@ from s3 bucket (see build_cover function for more details).
 """
 http = urllib3.PoolManager()
 
+
+def build_issue_id(issue_id):
+    """
+    Parameters:
+        issue_id (str): A string that serves as a unique id for the issue.
+
+    Returns:
+        Element: XML Element Object containing id child element for issue element.
+    """
+    TREE_BUILDER = ElementTree.TreeBuilder()
+    TREE_BUILDER.start("id", {"type":"internal", "advice":"ignore"})
+    TREE_BUILDER.data(issue_id)
+    TREE_BUILDER.end("id")
+
+
+def build_issue_galleys(namespace, schema):
+    """
+    Returns:
+        Element: Empty XML Element Object.
+
+    NOTE:
+        This element is required to import metadata into OJS.
+    """
+
+    TREE_BUILDER = ElementTree.TreeBuilder()
+    TREE_BUILDER.start("issue_galleys", {"xmlns:xsi": namespace, "xsi:schemaLocation": schema})
+    TREE_BUILDER.data("")
+    TREE_BUILDER.end("issue_galleys")
+
 def build_sections(children):
     """
     Build OJS Sections XML Element
@@ -76,6 +105,7 @@ def build_identification(children):
     TREE_BUILDER.end("issue_identification")
     return TREE_BUILDER.close()
 
+
 def build_cover(children):
     TREE_BUILDER = ElementTree.TreeBuilder()
     TREE_BUILDER.start("covers")
@@ -100,6 +130,7 @@ def build_cover(children):
     TREE_BUILDER.end("cover")
     TREE_BUILDER.end("covers")
     return TREE_BUILDER.close()
+
 
 def build_date_published(children):
     """
@@ -169,8 +200,8 @@ def build_article(children):
     TREE_BUILDER.start("authors", {"xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation":"http://pkp.sfu.ca native.xsd"})
     TREE_BUILDER.start("author", {
         "user_group_ref": "Author",
-        "seq": 1,
-        "id": ""
+        "seq": "1",
+        "id": "0"
         })
     TREE_BUILDER.start("givenname", {"locale":"en_US"})
     TREE_BUILDER.data(children['authorGivenname1'])
@@ -188,8 +219,8 @@ def build_article(children):
     if children['authorGivenname2'] != '':
         TREE_BUILDER.start("author", {
             "user_group_ref": "Author",
-            "seq": 2,
-            "id": ""
+            "seq": "2",
+            "id": "0"
             })
         TREE_BUILDER.start("givenname", {"locale":"en_US"})
         TREE_BUILDER.data(children['authorGivenname2'])
