@@ -46,10 +46,7 @@ def build_issue_galleys():
     """
 
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("issue_galleys", {
-        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
-        })
+    TREE_BUILDER.start("issue_galleys", { })
     TREE_BUILDER.data("")
     TREE_BUILDER.end("issue_galleys")
     return TREE_BUILDER.close()
@@ -179,10 +176,8 @@ def build_article(children):
     TREE_BUILDER.data(children["file_number"])
     TREE_BUILDER.end("id")
     TREE_BUILDER.start("submission_file", {
-        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "stage": children['submission_stage'],
-        "id": children['file_number'],
-        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
+        "id": children['file_number']
     })
     TREE_BUILDER.start("revision", {
         "number": children['revision_number'],
@@ -199,7 +194,6 @@ def build_article(children):
     # script to create the XML file locally, bucket_location below needs
     # to be switched to pdf_folder.
     TREE_BUILDER.start("href", {
-        #"section_ref": children['sectionAbbrev'],
         "src": children['bucket_location'] + children['file1'],
         "mime_type": "application/pdf"
     })
@@ -207,7 +201,6 @@ def build_article(children):
     TREE_BUILDER.end("revision")
     TREE_BUILDER.end("submission_file")
     TREE_BUILDER.start("publication", {
-        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "locale": "en_US",
         "version": "1",
         "status": "3",
@@ -224,7 +217,7 @@ def build_article(children):
     TREE_BUILDER.start("abstract", {})
     TREE_BUILDER.data(children['abstract'])
     TREE_BUILDER.end("abstract")
-    # Subject/Keywords are seperated by a ';' in the spreadsheet therefore
+    # Subject/Keywords are separated by a ';' in the spreadsheet therefore
     # parse it
     if 'keywords' in children:
         TREE_BUILDER.start('keywords', {})
@@ -286,10 +279,8 @@ def build_article(children):
         TREE_BUILDER.end("author")
     TREE_BUILDER.end("authors")
     TREE_BUILDER.start("article_galley", {
-        #"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "locale": "en_US",
-        "approved": "false",
-        #"xsi:schemaLocation": "http://pkp.sfu.ca native.xsd"
+        "approved": "false"
     })
     TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
     TREE_BUILDER.data(children['file_number'])
@@ -312,4 +303,3 @@ def build_article(children):
     TREE_BUILDER.end("publication")
     TREE_BUILDER.end("article")
     return TREE_BUILDER.close()
-

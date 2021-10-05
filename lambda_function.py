@@ -36,7 +36,8 @@ def lambda_handler(event, context):
     json: Response and Status of Lambda Function
     """
     import_list = []
-    bucket = "ul-theatreorgan"
+    #bucket = "ul-theatreorgan"
+    bucket = event['Records'][0]['s3']['bucket']['name']
     bucket_schema = "http://"
     bucket_url = bucket + ".s3.amazonaws.com"
     bucket_prefix = "/pdf/"
@@ -48,7 +49,7 @@ def lambda_handler(event, context):
                                           '/tmp/import.csv')
     input_csv = "/tmp/import.csv"
     input_file = csv.DictReader(open(input_csv))
-    output_file = "/tmp/conversion.xml"
+    #output_file = "/tmp/conversion.xml"
     issues = {}
     articles = {}
     sections = {}
@@ -62,7 +63,7 @@ def lambda_handler(event, context):
     #ElementTree.register_namespace("", "http://pkp.sfu.ca")
     #doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
     #root = doc.getroot()
-
+    
     # Tag Uploaded CSV for object lifecycle management
     key = 'csv/import.csv'
     client.put_object_tagging(
@@ -160,9 +161,9 @@ def lambda_handler(event, context):
         pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(root))
         open(output_file, 'w').write((pretty_xml.toprettyxml()))
         s3_resource.meta.client.upload_file(output_file, bucket, conversion_file)
+
     return {
         'statusCode': 200,
         'body': json.dumps('Converted:\n\t'
                            + 'Articles: ' + str(file_number) + '\n\t'
                            + 'Issues: ' + str(len(issues)))}
-
