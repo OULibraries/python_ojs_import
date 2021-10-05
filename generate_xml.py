@@ -6,11 +6,12 @@
 
  Vars:
     pdf_folder: Full path to directory containing article/issue PDF's, defaults to current working directory
-    input_csv: CSV containing OJS fields to conver to XML
+    input_csv: CSV containing OJS fields to convert to XML
     output_file: Resulting XML document for OJS Import
 """
 
 import csv
+import datetime
 import os
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
@@ -107,7 +108,7 @@ for issue_key, issue_metadata in issues.items():
         if import_dict['authorGivenname1'] == '' or import_dict['authorGivenname1'] == None or 'authorGivenname1' not in import_dict:
             import_dict['authorGivenname1'] = "Unknown"
         
-
+        
         import_dict['bucket_location'] = bucket_location
         file_number += 1
         import_dict['file_number'] = str(file_number)
