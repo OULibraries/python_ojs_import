@@ -15,10 +15,12 @@ import os
 import xml.dom.minidom
 import xml.etree.ElementTree as ElementTree
 from ojs_builder import (build_identification,
-                         build_publication,
+                         build_date_published,
                          build_article,
                          build_sections,
-                         build_cover)
+                         build_cover,
+                         build_issue_galleys,
+                         build_issue_id)
 
 import_list = []
 bucket = "mybucket"
@@ -28,7 +30,7 @@ bucket_prefix = "/pdf/"
 bucket_location = bucket_schema + bucket_url + bucket_prefix
 input_csv = "import.csv"
 input_file = csv.DictReader(open(input_csv))
-output_file = "conversion.xml"
+#output_file = "conversion.xml"
 issues = {}
 articles = {}
 sections = {}
@@ -39,9 +41,9 @@ schema_location = "xsi:schemaLocation=\"http://pkp.sfu.ca native.xsd\">"
 xml_header = (xml_version + " <issues " + xmlns
               + " " + xmlns_xsi + " " + schema_location + "</issues>")
 
-ElementTree.register_namespace("", "http://pkp.sfu.ca")
-doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
-root = doc.getroot()
+#ElementTree.register_namespace("", "http://pkp.sfu.ca")
+#doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+#root = doc.getroot()
 
 for row in input_file:
     import_list.append(row)
@@ -53,7 +55,8 @@ for import_dict in import_list:
             "issueVolume": import_dict['issueVolume'],
             "issueNumber": import_dict['issueNumber'],
             "issueDatepublished": import_dict['issueDatepublished'],
-            "issueTitle": import_dict['issueTitle']}
+            "issueTitle": import_dict['issueTitle'],
+            "issueCover": import_dict['issueCover']}
 
 for issue_title in issues:
     sections[issue_title] = []
@@ -66,14 +69,28 @@ for issue_title in issues:
             articles[issue_title].append(import_row)
 
 file_number = 0
+issue_identifier = 1
 for issue_key, issue_metadata in issues.items():
-    issue = ElementTree.Element("issue")
+    ElementTree.register_namespace("", "http://pkp.sfu.ca")
+    doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
+    root = doc.getroot()
+    # The issue element in the resulting XML can take a published attribute
+    # of either a 0 or a 1. This logic tells OJS whether the article should
+    # show as published or not in OJS.
+    if datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") < datetime.datetime.today():
+        is_published = 1
+    elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():
+        is_published = 0
+    issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
+    issue.append(build_issue_id(issue_identifier))
+
     issue.append(build_identification(issue_metadata))
-    issue.append(build_publication(issue_metadata))
+    issue.append(build_date_published(issue_metadata))
     issue.append(build_sections(sections[issue_key]))
     if issue_metadata['issueCover'] != '':
         issue.append(build_cover(issue_metadata))
-    doc_articles = ElementTree.Element("articles")
+    issue.append(build_issue_galleys())
+    doc_articles = ElementTree.Element("articles", {})
     for import_dict in articles[issue_key]:
         if 'authorEmail1' not in import_dict:
             import_dict['authorEmail1'] = ''
@@ -98,6 +115,10 @@ for issue_key, issue_metadata in issues.items():
     issue.append(doc_articles)
     root.append(issue)
 
-doc._setroot(root)
-pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(doc.getroot()))
-open(output_file, 'w').write((pretty_xml.toprettyxml()))
+    output_file = "conversion" + str(issue_identifier) + ".xml"
+    
+    issue_identifier += 1
+
+    doc._setroot(root)
+    pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(doc.getroot()))
+    open(output_file, 'w').write((pretty_xml.toprettyxml()))

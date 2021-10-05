@@ -63,7 +63,7 @@ def lambda_handler(event, context):
     #ElementTree.register_namespace("", "http://pkp.sfu.ca")
     #doc = ElementTree.ElementTree(ElementTree.fromstring(xml_header))
     #root = doc.getroot()
-    
+
     # Tag Uploaded CSV for object lifecycle management
     key = 'csv/import.csv'
     client.put_object_tagging(
