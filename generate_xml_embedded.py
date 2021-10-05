@@ -27,7 +27,7 @@ import_list = []
 pdf_folder = os.getcwd() + '/' + 'pdf/' 
 input_csv = "import.csv"
 input_file = csv.DictReader(open(input_csv))
-output_file = "conversion.xml"
+#output_file = "conversion.xml"
 issues = {}
 articles = {}
 sections = {}
@@ -110,6 +110,10 @@ for issue_key, issue_metadata in issues.items():
         doc_articles.append(build_article(import_dict))
     issue.append(doc_articles)
     root.append(issue)
+
+    output_file = "conversion" + str(issue_identifier) + ".xml"
+
+    issue_identifier += 1
 
     doc._setroot(root)
     pretty_xml = xml.dom.minidom.parseString(ElementTree.tostring(doc.getroot()))
