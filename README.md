@@ -37,7 +37,7 @@ General Usage
 
 **_Lambda Conversion_**
 
-1. Copy exmaples/import.csv to ./import.csv
+1. Copy examples/import.csv to ./import.csv
 
 2. Add metadata to respective CSV fields
 
