@@ -277,6 +277,63 @@ def build_article(children):
         TREE_BUILDER.data(children['authorEmail2'])
         TREE_BUILDER.end("email")
         TREE_BUILDER.end("author")
+    if children['authorGivenname3'] != '':
+        TREE_BUILDER.start("author", {
+            "user_group_ref": "Author",
+            "seq": "3",
+            "id": "3"
+            })
+        TREE_BUILDER.start("givenname", {"locale":"en_US"})
+        TREE_BUILDER.data(children['authorGivenname3'])
+        TREE_BUILDER.end("givenname")
+        TREE_BUILDER.start("familyname", {"locale":"en_US"})
+        TREE_BUILDER.data(children['authorFamilyname3'])
+        TREE_BUILDER.end("familyname")
+        TREE_BUILDER.start("affiliation", {})
+        TREE_BUILDER.data(children['authorAffiliation3'])
+        TREE_BUILDER.end("affiliation")
+        TREE_BUILDER.start("email", {})
+        TREE_BUILDER.data(children['authorEmail3'])
+        TREE_BUILDER.end("email")
+        TREE_BUILDER.end("author")
+    if children['authorGivenname4'] != '':
+        TREE_BUILDER.start("author", {
+            "user_group_ref": "Author",
+            "seq": "4",
+            "id": "4"
+            })
+        TREE_BUILDER.start("givenname", {"locale":"en_US"})
+        TREE_BUILDER.data(children['authorGivenname4'])
+        TREE_BUILDER.end("givenname")
+        TREE_BUILDER.start("familyname", {"locale":"en_US"})
+        TREE_BUILDER.data(children['authorFamilyname4'])
+        TREE_BUILDER.end("familyname")
+        TREE_BUILDER.start("affiliation", {})
+        TREE_BUILDER.data(children['authorAffiliation4'])
+        TREE_BUILDER.end("affiliation")
+        TREE_BUILDER.start("email", {})
+        TREE_BUILDER.data(children['authorEmail4'])
+        TREE_BUILDER.end("email")
+        TREE_BUILDER.end("author")
+    if children['authorGivenname5'] != '':
+        TREE_BUILDER.start("author", {
+            "user_group_ref": "Author",
+            "seq": "5",
+            "id": "5"
+        })
+        TREE_BUILDER.start("givenname", {"locale": "en_US"})
+        TREE_BUILDER.data(children['authorGivenname5'])
+        TREE_BUILDER.end("givenname")
+        TREE_BUILDER.start("familyname", {"locale": "en_US"})
+        TREE_BUILDER.data(children['authorFamilyname5'])
+        TREE_BUILDER.end("familyname")
+        TREE_BUILDER.start("affiliation", {})
+        TREE_BUILDER.data(children['authorAffiliation5'])
+        TREE_BUILDER.end("affiliation")
+        TREE_BUILDER.start("email", {})
+        TREE_BUILDER.data(children['authorEmail5'])
+        TREE_BUILDER.end("email")
+        TREE_BUILDER.end("author")
     TREE_BUILDER.end("authors")
     TREE_BUILDER.start("article_galley", {
         "locale": "en_US",
