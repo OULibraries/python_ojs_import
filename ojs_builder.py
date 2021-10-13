@@ -185,7 +185,7 @@ def build_article(children):
         "filename": children['file1'],
         "viewable": "true",
         "filetype": "application/pdf",
-        "uploader": "testsoonermagazineadmin"
+        "uploader": children['uploader'] 
     })
     TREE_BUILDER.start("name", {"locale": "en_US"})
     TREE_BUILDER.data(children['file1'])
