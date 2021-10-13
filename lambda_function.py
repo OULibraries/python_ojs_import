@@ -36,7 +36,6 @@ def lambda_handler(event, context):
     json: Response and Status of Lambda Function
     """
     import_list = []
-    #bucket = "ul-theatreorgan"
     bucket = event['Records'][0]['s3']['bucket']['name']
     bucket_schema = "http://"
     bucket_url = bucket + ".s3.amazonaws.com"
