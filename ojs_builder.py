@@ -30,7 +30,7 @@ def build_issue_id(issue_id):
     """
     issue_id_string = str(issue_id)
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("id", {"type":"internal", "advice":"ignore"})
+    TREE_BUILDER.start("id", {"type": "internal", "advice": "ignore"})
     TREE_BUILDER.data(issue_id_string)
     TREE_BUILDER.end("id")
     return TREE_BUILDER.close()

@@ -5,16 +5,15 @@
  The final XML Tree that is built is then dumped to a file for import into OJS
 
  Vars:
-    pdf_folder: Full path to directory containing article/issue PDF's, defaults to current working directory
-    input_csv: CSV containing OJS fields to convert to XML
-    output_file: Resulting XML document for OJS Import
+    pdf_folder: Full path to directory containing article/issue PDF's, defaults
+    to current working directory input_csv: CSV containing OJS fields to convert 
+    to XML output_file: Resulting XML document for OJS Import
 """
 
 import csv
 import datetime
-import os
 import xml.dom.minidom
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 from ojs_builder import (build_identification,
                          build_date_published,
                          build_article,
@@ -78,9 +77,11 @@ for issue_key, issue_metadata in issues.items():
     # The issue element in the resulting XML can take a published attribute
     # of either a 0 or a 1. This logic tells OJS whether the article should
     # show as published or not in OJS.
-    if datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") < datetime.datetime.today():
+    if datetime.datetime.strptime(issue_metadata['issueDatepublished'], \
+            "%Y-%m-%d") < datetime.datetime.today():
         is_published = 1
-    elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], "%Y-%m-%d") > datetime.datetime.today():
+    elif datetime.datetime.strptime(issue_metadata['issueDatepublished'], \
+            "%Y-%m-%d") > datetime.datetime.today():
         is_published = 0
     issue = ElementTree.Element("issue", attrib={"current":"0", "published": str(is_published)})
     issue.append(build_issue_id(issue_identifier))
@@ -103,12 +104,16 @@ for issue_key, issue_metadata in issues.items():
             import_dict['fileGenre1'] = 'Article Text'
         if 'revision_number' not in import_dict:
             import_dict['revision_number'] = "1"
-        if import_dict['authorFamilyname1'] == '' or import_dict['authorFamilyname1'] == None or 'authorFamilyname1' not in import_dict:
+        if import_dict['authorFamilyname1'] == '' \
+                or import_dict['authorFamilyname1'] is None \
+                or 'authorFamilyname1' not in import_dict:
             import_dict['authorFamilyname1'] = "Unknown"
-        if import_dict['authorGivenname1'] == '' or import_dict['authorGivenname1'] == None or 'authorGivenname1' not in import_dict:
+        if import_dict['authorGivenname1'] == '' \
+                or import_dict['authorGivenname1'] is None \
+                or 'authorGivenname1' not in import_dict:
             import_dict['authorGivenname1'] = "Unknown"
-        
-        
+
+
         import_dict['bucket_location'] = bucket_location
         file_number += 1
         import_dict['file_number'] = str(file_number)
