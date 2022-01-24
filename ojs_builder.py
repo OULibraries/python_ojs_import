@@ -115,12 +115,12 @@ def build_identification(children):
 
 def build_cover(children):
     TREE_BUILDER = ElementTree.TreeBuilder()
-    TREE_BUILDER.start("covers")
-    TREE_BUILDER.start("cover")
-    TREE_BUILDER.start("cover_image")
+    TREE_BUILDER.start("covers", {})
+    TREE_BUILDER.start("cover", {})
+    TREE_BUILDER.start("cover_image", {})
     TREE_BUILDER.data(children['issueCover'])
     TREE_BUILDER.end("cover_image")
-    TREE_BUILDER.start("cover_image_alt_text")
+    TREE_BUILDER.start("cover_image_alt_text", {})
     TREE_BUILDER.data("")
     TREE_BUILDER.end("cover_image_alt_text")
     TREE_BUILDER.start("embed", {
@@ -185,7 +185,7 @@ def build_article(children):
         "filename": children['file1'],
         "viewable": "true",
         "filetype": "application/pdf",
-        "uploader": children['uploader'] 
+        "uploader": children['uploader']
     })
     TREE_BUILDER.start("name", {"locale": "en_US"})
     TREE_BUILDER.data(children['file1'])
