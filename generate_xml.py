@@ -29,7 +29,7 @@ bucket_url = bucket + ".s3.amazonaws.com"
 bucket_prefix = "/pdf/"
 bucket_location = bucket_schema + bucket_url + bucket_prefix
 input_csv = "import.csv"
-input_file = csv.DictReader(open(input_csv))
+input_file = csv.DictReader(open(input_csv, encoding='utf-8-sig'))
 #output_file = "conversion.xml"
 issues = {}
 articles = {}
@@ -98,6 +98,12 @@ for issue_key, issue_metadata in issues.items():
             import_dict['authorEmail1'] = ''
         if 'authorEmail2' not in import_dict:
             import_dict['authorEmail2'] = ''
+        if 'authorEmail3' not in import_dict:
+            import_dict['authorEmail3'] = ''
+        if 'authorEmail4' not in import_dict:
+            import_dict['authorEmail4'] = ''
+        if 'authorEmail5' not in import_dict:
+            import_dict['authorEmail5'] = ''
         if 'submission_stage' not in import_dict:
             import_dict['submission_stage'] = 'submission'
         if import_dict['fileGenre1'] == '':
